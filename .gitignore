@@ -1,0 +1,39 @@
+__pycache__/
+*.py[cod]
+*$py.class
+
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+.venv/
+venv/
+env/
+
+.DS_Store
+Thumbs.db
+
+*.log
+
+# ---- never publish -------------------------------------------------------
+# Paid add-on preset packs. Drop-in files land here and are merged into the
+# Load Preset list at runtime; none of them ship with the free node pack.
+presets/packs/*.json
+
+# Personal saved presets written by the "Save My Preset to Disk" button.
+presets/user_prompt_presets.json
+
+# Working notes and development history. Kept locally, never pushed.
+HANDOFF.md
+HANDOFF-NEXT.md
+ROADMAP.md
+SHARE.md
+docs/REDESIGN_v11.md
+
+# Working images, videos and parked graphs. Only the named release files ship.
+workflow/*
+!workflow/Smart-Upscaler-Z-Turbo-v1a.json
+!workflow/Upscale_Test_Image.png
+
+# Build output.
+releases/

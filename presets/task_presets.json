@@ -1,0 +1,5 @@
+{
+  "version": 3,
+  "comment": "Smart Upscaler task presets. This file ships EMPTY on purpose. The Prompt Director works without it - its Instructions box, Prompt Detail Level and colour repair all default from code (UNIFIED_TASK_INSTRUCTIONS in nodes/universal_prompting.py). Add named entries here, drop a bought pack into presets/packs/, or use 'Save My Preset to Disk', and they appear in the Load Preset dropdown automatically. Entry format is documented in presets/packs/README.md.",
+  "presets": {}
+}

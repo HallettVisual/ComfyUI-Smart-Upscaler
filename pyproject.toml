@@ -1,0 +1,16 @@
+[project]
+name = "comfyui-smart-upscaler"
+version = "1.1.0"
+description = "Tiled upscaling for ComfyUI that reads the whole image first, then writes a separate accurate prompt for every tile."
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.10"
+dependencies = []
+keywords = ["comfyui", "upscaling", "tiled", "prompting", "vision", "z-image"]
+
+[tool.comfy]
+DisplayName = "Smart Upscaler"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
