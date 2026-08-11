@@ -17,9 +17,10 @@ Homepage = "https://hallett-ai.com"
 # Comfy Registry. `version` above is what the registry publishes - bump it every
 # time, the registry rejects a version it has already seen.
 [tool.comfy]
-# From your publisher account at https://registry.comfy.org - without it the
-# publish is rejected.
-PublisherId = ""
+# Publisher account at https://registry.comfy.org - without it the publish is
+# rejected. This is public metadata, not a secret. The API key is a separate
+# value and belongs in the REGISTRY_ACCESS_TOKEN repository secret, never here.
+PublisherId = "hallettvisual"
 DisplayName = "Smart Upscaler"
 # Optional listing image, max 800x400. A raw.githubusercontent.com URL works.
 Icon = ""
