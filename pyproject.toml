@@ -8,8 +8,21 @@ requires-python = ">=3.10"
 dependencies = []
 keywords = ["comfyui", "upscaling", "tiled", "prompting", "vision", "z-image"]
 
+[project.urls]
+Repository = "https://github.com/HallettVisual/ComfyUI-Smart-Upscaler"
+Documentation = "https://github.com/HallettVisual/ComfyUI-Smart-Upscaler/blob/main/README.md"
+"Bug Tracker" = "https://github.com/HallettVisual/ComfyUI-Smart-Upscaler/issues"
+Homepage = "https://hallett-ai.com"
+
+# Comfy Registry. `version` above is what the registry publishes - bump it every
+# time, the registry rejects a version it has already seen.
 [tool.comfy]
+# From your publisher account at https://registry.comfy.org - without it the
+# publish is rejected.
+PublisherId = ""
 DisplayName = "Smart Upscaler"
+# Optional listing image, max 800x400. A raw.githubusercontent.com URL works.
+Icon = ""
 
 [tool.ruff]
 line-length = 100

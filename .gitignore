@@ -37,3 +37,9 @@ workflow/*
 
 # Build output.
 releases/
+
+# Stray screenshots and media dropped in the repo root. Add one by name if you
+# actually want it published.
+/*.jpg
+/*.jpeg
+/*.mp4
