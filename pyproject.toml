@@ -1,6 +1,6 @@
 [project]
 name = "comfyui-smart-upscaler"
-version = "1.1.1"
+version = "1.1.2"
 description = "Tiled upscaling for ComfyUI that reads the whole image first, then writes a separate accurate prompt for every tile."
 readme = "README.md"
 license = { file = "LICENSE" }
@@ -21,7 +21,7 @@ Homepage = "https://hallett-ai.com"
 # rejected. This is public metadata, not a secret. The API key is a separate
 # value and belongs in the REGISTRY_ACCESS_TOKEN repository secret, never here.
 PublisherId = "hallettvisual"
-DisplayName = "Smart Upscaler"
+DisplayName = "Smart Upscaler - Hallett"
 # Optional listing image, max 800x400. A raw.githubusercontent.com URL works.
 Icon = ""
 
