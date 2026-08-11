@@ -43,3 +43,10 @@ releases/
 /*.jpg
 /*.jpeg
 /*.mp4
+
+# Development-only tooling. Not needed to run the nodes, and it is extra
+# surface for the registry security scan.
+scripts/
+
+# Downloaded copies of the README. Only README.md ships.
+README(*).md
