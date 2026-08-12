@@ -478,16 +478,19 @@ def _apply_global_brief_guard(value):
 
 
 def _cache_root():
-    override = os.environ.get("SMART_UPSCALER_CACHE_DIR")
-    if override:
-        root = Path(override)
-    else:
-        try:
-            import folder_paths
+    """Where every cache lives, under the ComfyUI user directory.
 
-            root = Path(folder_paths.get_user_directory()) / "smart_upscaler_cache"
-        except ImportError:
-            root = Path(tempfile.gettempdir()) / "smart_upscaler_cache"
+    Deliberately not overridable from the environment. The registry security
+    scan reads an environment variable feeding a filesystem path as
+    `python_environment_manipulation` and flags the whole package, which blocks
+    installation. Tests patch this function directly instead.
+    """
+    try:
+        import folder_paths
+
+        root = Path(folder_paths.get_user_directory()) / "smart_upscaler_cache"
+    except ImportError:
+        root = Path(tempfile.gettempdir()) / "smart_upscaler_cache"
     root.mkdir(parents=True, exist_ok=True)
     return root
 

@@ -10,6 +10,7 @@ import json
 import os
 import tempfile
 import unittest
+from pathlib import Path
 from unittest.mock import patch
 
 import torch
@@ -236,7 +237,7 @@ class WholeImageSurfaceReliabilityTests(unittest.TestCase):
         global_instruction, prompt_system, _ = SmartUnifiedPromptGuidance().build()
         model = SkipsSurfacesThenAnswersModel()
         with tempfile.TemporaryDirectory() as cache_directory:
-            with patch.dict(os.environ, {"SMART_UPSCALER_CACHE_DIR": cache_directory}):
+            with patch("nodes.cache._cache_root", return_value=Path(cache_directory)):
                 text, status, _ = SmartCachedTextGenerate().generate(
                     model,
                     image,
@@ -303,7 +304,7 @@ class WholeImageSurfaceReliabilityTests(unittest.TestCase):
         global_instruction, prompt_system, _ = SmartUnifiedPromptGuidance().build()
         model = GoodBriefModel()
         with tempfile.TemporaryDirectory() as cache_directory:
-            with patch.dict(os.environ, {"SMART_UPSCALER_CACHE_DIR": cache_directory}):
+            with patch("nodes.cache._cache_root", return_value=Path(cache_directory)):
                 text, status, _ = SmartCachedTextGenerate().generate(
                     model,
                     image,
@@ -451,7 +452,7 @@ class MainSubjectTrackingTests(unittest.TestCase):
         )
         model = SkipsSubjectThenAnswersModel()
         with tempfile.TemporaryDirectory() as cache_directory:
-            with patch.dict(os.environ, {"SMART_UPSCALER_CACHE_DIR": cache_directory}):
+            with patch("nodes.cache._cache_root", return_value=Path(cache_directory)):
                 text, _, _ = SmartCachedTextGenerate().generate(
                     model,
                     image,
@@ -613,7 +614,7 @@ class MainSubjectTrackingTests(unittest.TestCase):
         )
         model = AnswersWithPartsModel()
         with tempfile.TemporaryDirectory() as cache_directory:
-            with patch.dict(os.environ, {"SMART_UPSCALER_CACHE_DIR": cache_directory}):
+            with patch("nodes.cache._cache_root", return_value=Path(cache_directory)):
                 text, _, _ = SmartCachedTextGenerate().generate(
                     model,
                     image,
@@ -710,7 +711,7 @@ class MainSubjectTrackingTests(unittest.TestCase):
         )
         model = LazyThenSegmentedModel()
         with tempfile.TemporaryDirectory() as cache_directory:
-            with patch.dict(os.environ, {"SMART_UPSCALER_CACHE_DIR": cache_directory}):
+            with patch("nodes.cache._cache_root", return_value=Path(cache_directory)):
                 text, _, _ = SmartCachedTextGenerate().generate(
                     model,
                     image,
@@ -770,7 +771,7 @@ class MainSubjectTrackingTests(unittest.TestCase):
         )
         model = BrokenEntryModel()
         with tempfile.TemporaryDirectory() as cache_directory:
-            with patch.dict(os.environ, {"SMART_UPSCALER_CACHE_DIR": cache_directory}):
+            with patch("nodes.cache._cache_root", return_value=Path(cache_directory)):
                 text, _, _ = SmartCachedTextGenerate().generate(
                     model,
                     image,
@@ -822,7 +823,7 @@ class MainSubjectTrackingTests(unittest.TestCase):
         )
         model = NoSubjectModel()
         with tempfile.TemporaryDirectory() as cache_directory:
-            with patch.dict(os.environ, {"SMART_UPSCALER_CACHE_DIR": cache_directory}):
+            with patch("nodes.cache._cache_root", return_value=Path(cache_directory)):
                 text, _, _ = SmartCachedTextGenerate().generate(
                     model,
                     image,
@@ -1488,7 +1489,7 @@ class DeterministicUniformCaptionTests(unittest.TestCase):
             "artifacts, seams",
         )
         with tempfile.TemporaryDirectory() as cache_directory:
-            with patch.dict(os.environ, {"SMART_UPSCALER_CACHE_DIR": cache_directory}):
+            with patch("nodes.cache._cache_root", return_value=Path(cache_directory)):
                 self.assertEqual(node.check_lazy_status(None, *arguments), [])
                 result = node.generate(None, *arguments)
         self.assertIn("DETERMINISTIC", result[4])
@@ -1513,7 +1514,7 @@ class DeterministicUniformCaptionTests(unittest.TestCase):
             "artifacts, seams",
         )
         with tempfile.TemporaryDirectory() as cache_directory:
-            with patch.dict(os.environ, {"SMART_UPSCALER_CACHE_DIR": cache_directory}):
+            with patch("nodes.cache._cache_root", return_value=Path(cache_directory)):
                 self.assertEqual(node.check_lazy_status(None, *arguments), ["clip"])
 
 
@@ -1684,7 +1685,7 @@ class AnalysisImageCapTests(unittest.TestCase):
         )
         model = ShapeRecordingModel()
         with tempfile.TemporaryDirectory() as cache_directory:
-            with patch.dict(os.environ, {"SMART_UPSCALER_CACHE_DIR": cache_directory}):
+            with patch("nodes.cache._cache_root", return_value=Path(cache_directory)):
                 SmartCachedTextGenerate().generate(
                     model,
                     image,
@@ -1828,7 +1829,7 @@ class SurfacePromptSafetyTests(unittest.TestCase):
         global_instruction, prompt_system, _ = SmartUnifiedPromptGuidance().build()
         model = RepeatsBadSurfaceModel()
         with tempfile.TemporaryDirectory() as cache_directory:
-            with patch.dict(os.environ, {"SMART_UPSCALER_CACHE_DIR": cache_directory}):
+            with patch("nodes.cache._cache_root", return_value=Path(cache_directory)):
                 text, _, _ = SmartCachedTextGenerate().generate(
                     model,
                     image,

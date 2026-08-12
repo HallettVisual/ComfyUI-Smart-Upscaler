@@ -12,9 +12,6 @@ _MAX_PRESET_BYTES = 256 * 1024
 
 
 def _preset_path():
-    override = os.environ.get("SMART_UPSCALER_PRESET_FILE")
-    if override:
-        return Path(override)
     return Path(__file__).resolve().parent / "presets" / "user_prompt_presets.json"
 
 

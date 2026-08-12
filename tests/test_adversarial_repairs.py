@@ -527,8 +527,8 @@ class PromptRecoveryTests(unittest.TestCase):
         )
         model = WaterThenCabinModel()
         with tempfile.TemporaryDirectory() as cache_directory:
-            with patch.dict(
-                os.environ, {"SMART_UPSCALER_CACHE_DIR": cache_directory}
+            with patch(
+                "nodes.cache._cache_root", return_value=Path(cache_directory)
             ):
                 result = SmartCachedTilePromptGenerator().generate(
                     model,
@@ -604,8 +604,8 @@ class PromptRecoveryTests(unittest.TestCase):
         )
         model = AlwaysWaterModel()
         with tempfile.TemporaryDirectory() as cache_directory:
-            with patch.dict(
-                os.environ, {"SMART_UPSCALER_CACHE_DIR": cache_directory}
+            with patch(
+                "nodes.cache._cache_root", return_value=Path(cache_directory)
             ):
                 result = SmartCachedTilePromptGenerator().generate(
                     model,

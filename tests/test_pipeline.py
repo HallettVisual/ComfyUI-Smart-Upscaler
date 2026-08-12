@@ -520,7 +520,7 @@ EXACT-TILE PASS: Use only exact-tile evidence and spatially matching master cont
         )
         model = FalseThenSafeCaptionModel()
         with tempfile.TemporaryDirectory() as cache_directory:
-            with patch.dict(os.environ, {"SMART_UPSCALER_CACHE_DIR": cache_directory}):
+            with patch("nodes.cache._cache_root", return_value=Path(cache_directory)):
                 result = SmartCachedTilePromptGenerator().generate(
                     model,
                     image,
@@ -576,7 +576,7 @@ EXACT-TILE PASS: Use only exact-tile evidence and spatially matching master cont
         )
         model = RepeatsFalseDetectionModel()
         with tempfile.TemporaryDirectory() as cache_directory:
-            with patch.dict(os.environ, {"SMART_UPSCALER_CACHE_DIR": cache_directory}):
+            with patch("nodes.cache._cache_root", return_value=Path(cache_directory)):
                 result = SmartCachedTilePromptGenerator().generate(
                     model,
                     image,
@@ -838,7 +838,7 @@ EXACT-TILE PASS: Use only exact-tile evidence and spatially matching master cont
 
         model = BackgroundThenWaterModel()
         with tempfile.TemporaryDirectory() as cache_directory:
-            with patch.dict(os.environ, {"SMART_UPSCALER_CACHE_DIR": cache_directory}):
+            with patch("nodes.cache._cache_root", return_value=Path(cache_directory)):
                 result = SmartCachedTilePromptGenerator().generate(
                     model,
                     selected_images[0],
@@ -895,7 +895,7 @@ EXACT-TILE PASS: Use only exact-tile evidence and spatially matching master cont
         _, system, _ = SmartPromptGuidance().build(task_preset="Google Image Enhance")
         model = MissingLocalCaptionModel()
         with tempfile.TemporaryDirectory() as cache_directory:
-            with patch.dict(os.environ, {"SMART_UPSCALER_CACHE_DIR": cache_directory}):
+            with patch("nodes.cache._cache_root", return_value=Path(cache_directory)):
                 result = SmartCachedTilePromptGenerator().generate(
                     model,
                     image,
@@ -1190,7 +1190,7 @@ EXACT-TILE PASS: Use only exact-tile evidence and spatially matching master cont
         )
         model = FalseThenSafeGlobalModel()
         with tempfile.TemporaryDirectory() as cache_directory:
-            with patch.dict(os.environ, {"SMART_UPSCALER_CACHE_DIR": cache_directory}):
+            with patch("nodes.cache._cache_root", return_value=Path(cache_directory)):
                 result = SmartCachedTextGenerate().generate(
                     model,
                     image,
@@ -1474,7 +1474,7 @@ EXACT-TILE PASS: Use only exact-tile evidence and spatially matching master cont
             ).movedim(1, -1)
 
         with tempfile.TemporaryDirectory() as cache_directory:
-            with patch.dict(os.environ, {"SMART_UPSCALER_CACHE_DIR": cache_directory}):
+            with patch("nodes.cache._cache_root", return_value=Path(cache_directory)):
                 with patch(
                     "nodes.upscaled_tiling._upscale_tiles_with_model",
                     side_effect=fake_upscale,
@@ -1574,10 +1574,11 @@ EXACT-TILE PASS: Use only exact-tile evidence and spatially matching master cont
             with patch.dict(
                 os.environ,
                 {
-                    "SMART_UPSCALER_CACHE_DIR": cache_directory,
                     "SMART_UPSCALER_ESRGAN_CACHE_MAX_GB": "12",
                     "SMART_UPSCALER_CACHE_FREE_RESERVE_GB": "2",
                 },
+            ), patch(
+                "nodes.cache._cache_root", return_value=Path(cache_directory)
             ), patch("nodes.cache.shutil.disk_usage", return_value=disk_usage):
                 path, reason = save_esrgan_tiles("low-space", tiles)
 
@@ -1686,7 +1687,7 @@ EXACT-TILE PASS: Use only exact-tile evidence and spatially matching master cont
         )
 
         with tempfile.TemporaryDirectory() as cache_directory:
-            with patch.dict(os.environ, {"SMART_UPSCALER_CACHE_DIR": cache_directory}):
+            with patch("nodes.cache._cache_root", return_value=Path(cache_directory)):
                 self.assertEqual(node.check_lazy_status(None, *arguments), ["clip"])
                 first = node.generate(model, *arguments)
                 self.assertFalse(model.tokenize_args[1]["thinking"])
@@ -1738,7 +1739,7 @@ EXACT-TILE PASS: Use only exact-tile evidence and spatially matching master cont
         )
         _, system, _ = SmartPromptGuidance().build()
         with tempfile.TemporaryDirectory() as cache_directory:
-            with patch.dict(os.environ, {"SMART_UPSCALER_CACHE_DIR": cache_directory}):
+            with patch("nodes.cache._cache_root", return_value=Path(cache_directory)):
                 result = SmartCachedTilePromptGenerator().generate(
                     RetryCaptionModel(),
                     image,

@@ -1,6 +1,6 @@
 [project]
 name = "comfyui-smart-upscaler"
-version = "1.1.3"
+version = "1.1.4"
 description = "Tiled upscaling for ComfyUI that reads the whole image first, then writes a separate accurate prompt for every tile."
 readme = "README.md"
 license = { file = "LICENSE" }
