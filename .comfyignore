@@ -1,0 +1,21 @@
+# Files kept in git but deliberately left out of the Comfy Registry archive.
+# Syntax matches .gitignore. See https://docs.comfy.org/registry/publishing
+#
+# Everything here is development or presentation material. None of it is needed
+# to run a single node, and all of it is still on GitHub for anyone who wants it.
+
+# Test suite. The registry docs name tests as the example of what to exclude,
+# and test_adversarial_repairs.py is full of attack-shaped vocabulary that a
+# security scan has no way to tell apart from the real thing.
+tests/
+
+# CI configuration. It references a publishing token by name and does nothing
+# at runtime.
+.github/
+
+# Repository housekeeping.
+.gitignore
+
+# Promotional image, 8.3 MB. It is what the README shows on GitHub; nobody
+# needs it sitting in their custom_nodes folder.
+Before_After_4_First_Frame.png
