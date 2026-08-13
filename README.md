@@ -12,10 +12,7 @@ The result is sharper detail with much stronger consistency across the full imag
 Free and open source. MIT.
 
 
-
-<img width="1936" height="1072" alt="Goolge_real2_00398" src="https://github.com/user-attachments/assets/03736fef-e72f-440e-b8bd-4856c34a8e8f" />
-
-<!-- Before/after comparison goes here. -->
+<img width="1200" height="613" alt="smart-upscaler-workflow" src="https://github.com/user-attachments/assets/78a31fe8-e2b5-4215-8654-329431e2b5a9" />
 
 ---
 
@@ -34,8 +31,7 @@ takes an image and a prompt and returns an image can sit there.
 
 ---
 
-<img width="1200" height="613" alt="smart-upscaler-workflow" src="https://github.com/user-attachments/assets/bb059e3c-b6d8-47c3-a11b-767b76bdeaac" />
-
+<img width="420" height="250" alt="Clip_for_GIF_under10mb_420w_10fps" src="https://github.com/user-attachments/assets/c41321f4-3abd-427a-9ddd-62431123f458" />
 
 ## Install
 
@@ -74,7 +70,7 @@ rather than by changing models.
 Everything else has a working default.
 
 
-
+<img width="3779" height="2327" alt="Readme_Demo01" src="https://github.com/user-attachments/assets/baed62b8-3f34-4609-ae44-3085e67db3e5" />
 
 ### Instructions
 
