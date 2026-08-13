@@ -1,17 +1,19 @@
-# ComfyUI Smart Upscaler
+# ComfyUI Smart Upscaler by Matt Hallett
+
 
 **Every tile gets its own prompt — written after reading the whole picture.**
 
-A normal tiled upscaler sees a crop of roof and thinks *brown texture*. It sees a
-patch of lake and thinks *blue gradient*. Then the model paints those guesses,
-and you get something sharper but subtly wrong, with seams where neighbouring
-tiles guessed differently.
+Smart Upscaler sees the entire image first and uses an LLM to understand what each area actually represents.
 
-Smart Upscaler looks at the **whole image first**. Tile 7 knows it is part of a
-slate roof. The four tiles covering the lake all get the *same* wording for that
-water, so they cannot disagree at the seam.
+A patch of lake is understood as water. A slate roof is understood as part of a larger roof. Every tile is generated with that wider image context in mind.
+
+The result is sharper detail with much stronger consistency across the full image, including matching textures, materials, surfaces, and seamless transitions between neighbouring tiles.
 
 Free and open source. MIT.
+
+
+
+<img width="1936" height="1072" alt="Goolge_real2_00398" src="https://github.com/user-attachments/assets/03736fef-e72f-440e-b8bd-4856c34a8e8f" />
 
 <!-- Before/after comparison goes here. -->
 
@@ -31,6 +33,9 @@ Steps 1–3 and 6 are what this pack does. **Step 4 is yours** — anything that
 takes an image and a prompt and returns an image can sit there.
 
 ---
+
+<img width="1200" height="613" alt="smart-upscaler-workflow" src="https://github.com/user-attachments/assets/bb059e3c-b6d8-47c3-a11b-767b76bdeaac" />
+
 
 ## Install
 
@@ -67,6 +72,9 @@ rather than by changing models.
 ## The two controls that matter
 
 Everything else has a working default.
+
+
+
 
 ### Instructions
 
