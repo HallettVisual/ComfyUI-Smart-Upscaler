@@ -32,7 +32,6 @@ docs/REDESIGN_v11.md
 
 # Working images, videos and parked graphs. Only the named release files ship.
 workflow/*
-!workflow/Smart-Upscaler-Z-Turbo-v1a.json
 !workflow/Smart-Upscaler-Z-Turbo-v2.json
 !workflow/Upscale_Test_Image.png
 

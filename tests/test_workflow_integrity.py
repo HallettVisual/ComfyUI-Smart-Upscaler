@@ -13,9 +13,7 @@ import nodes as node_registry
 
 WORKFLOW_DIR = Path(__file__).resolve().parents[1] / "workflow"
 RELEASE_WORKFLOW = "Smart-Upscaler-Z-Turbo-v2.json"
-# v1a is the previous release. It is no longer shipped, but it stays checked so
-# an accidental edit to it cannot pass unnoticed.
-WORKFLOW_FILES = (RELEASE_WORKFLOW, "Smart-Upscaler-Z-Turbo-v1a.json")
+WORKFLOW_FILES = (RELEASE_WORKFLOW,)
 
 
 def _load(name):
