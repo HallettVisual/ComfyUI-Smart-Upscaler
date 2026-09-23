@@ -12,6 +12,11 @@ import weakref
 
 import torch
 
+# The vision model's identity inside every caption cache key. It was a widget
+# whose only job was cache namespacing, which cache_tag already does; the value
+# stays here so caches written before it was removed keep matching.
+VISION_MODEL_CACHE_ID = "Qwen3-VL-4B-FP8"
+
 from .prompting import (
     SmartTilePromptResolver,
     _apply_known_false_detection_guard,
@@ -808,7 +813,14 @@ class SmartCachedTextGenerate:
                 "prompt": ("STRING", {"forceInput": True}),
                 "max_length": (
                     "INT",
-                    {"default": 1024, "min": 1, "max": 32768, "label": "Caption Length Limit"},
+                    {
+                        "default": 1024,
+                        "min": 1,
+                        "max": 32768,
+                        "advanced": True,
+                        "label": "Caption Length Limit",
+                        "tooltip": "Token ceiling for the whole-image brief. 1024 fits every shipped preset; raise it only if a brief is visibly cut off.",
+                    },
                 ),
                 "sampling_mode": (
                     [
@@ -868,22 +880,13 @@ class SmartCachedTextGenerate:
                         "tooltip": "Longest side of the image sent to the vision model for the whole-image brief and its follow-up questions. Smaller = faster and less VRAM on every question; 1344 loses nothing for a scene brief. 0 sends the full image.",
                     },
                 ),
-                "vision_model_id": (
-                    "STRING",
-                    {
-                        "default": "Qwen3-VL-4B-FP8",
-                        "advanced": True,
-                        "label": "Vision Model Cache ID",
-                        "tooltip": "Cache identity for the connected caption model. Change this when replacing or updating that model; this prevents old captions from another model being reused.",
-                    },
-                ),
             },
         }
 
     @staticmethod
     def _context(
         max_length, sampling_mode, thinking, use_default_template, key_context,
-        analysis_max_side=1344, vision_model_id="Qwen3-VL-4B-FP8",
+        analysis_max_side=1344,
     ):
         return json.dumps(
             {
@@ -893,7 +896,7 @@ class SmartCachedTextGenerate:
                 "use_default_template": bool(use_default_template),
                 "key_context": str(key_context),
                 "analysis_max_side": int(analysis_max_side),
-                "vision_model_id": str(vision_model_id).strip(),
+                "vision_model_id": VISION_MODEL_CACHE_ID,
             },
             sort_keys=True,
         )
@@ -1167,14 +1170,14 @@ class SmartCachedTextGenerate:
     def check_lazy_status(
         self, clip, image, prompt, max_length, sampling_mode, thinking,
         use_default_template, cache_mode, cache_tag, key_context="", prompt_system=None,
-        analysis_max_side=1344, vision_model_id="Qwen3-VL-4B-FP8",
+        analysis_max_side=1344,
     ):
         _require_single_image(image, "Whole-image captioning")
         if clip is not None:
             return []
         context = self._context(
             max_length, sampling_mode, thinking, use_default_template, key_context,
-            analysis_max_side, vision_model_id,
+            analysis_max_side,
         )
         if cache_mode == "read_write":
             prompt, measured = self._measured_augmentation(image, prompt, prompt_system)
@@ -1190,12 +1193,12 @@ class SmartCachedTextGenerate:
     def generate(
         self, clip, image, prompt, max_length, sampling_mode, thinking,
         use_default_template, cache_mode, cache_tag, key_context="", prompt_system=None,
-        analysis_max_side=1344, vision_model_id="Qwen3-VL-4B-FP8",
+        analysis_max_side=1344,
     ):
         _require_single_image(image, "Whole-image captioning")
         context = self._context(
             max_length, sampling_mode, thinking, use_default_template, key_context,
-            analysis_max_side, vision_model_id,
+            analysis_max_side,
         )
         prompt, measured = self._measured_augmentation(image, prompt, prompt_system)
         vision_image = _analysis_image(image, analysis_max_side)
@@ -1404,15 +1407,6 @@ class SmartCachedTilePromptGenerator:
                         "tooltip": "Longest side of each real (unpadded) tile sent to the vision model. 1344 is the balanced 16 GB default; 0 sends the full tile, while 768-1024 saves more VRAM with a small fine-detail cost.",
                     },
                 ),
-                "vision_model_id": (
-                    "STRING",
-                    {
-                        "default": "Qwen3-VL-4B-FP8",
-                        "advanced": True,
-                        "label": "Vision Model Cache ID",
-                        "tooltip": "Cache identity for the connected caption model. Change this when replacing or updating that model; this prevents old tile captions from another model being reused.",
-                    },
-                ),
             },
         }
 
@@ -1447,7 +1441,6 @@ class SmartCachedTilePromptGenerator:
         tile_reference,
         caption_generation,
         caption_max_side=1344,
-        vision_model_id="Qwen3-VL-4B-FP8",
         prompt_system=None,
     ):
         return json.dumps(
@@ -1458,7 +1451,7 @@ class SmartCachedTilePromptGenerator:
                 "template": True,
                 "max_length": cls._caption_token_budget(prompt_system),
                 "caption_max_side": int(caption_max_side),
-                "vision_model_id": str(vision_model_id).strip(),
+                "vision_model_id": VISION_MODEL_CACHE_ID,
             },
             sort_keys=True,
         )
@@ -1570,7 +1563,6 @@ class SmartCachedTilePromptGenerator:
         cache_tag,
         negative_prompt_fallback,
         caption_max_side=1344,
-        vision_model_id="Qwen3-VL-4B-FP8",
     ):
         _require_single_image(image, "Tile captioning")
         if self._uses_direct_user(prompt_system) or clip is not None:
@@ -1589,7 +1581,6 @@ class SmartCachedTilePromptGenerator:
                     tile_reference,
                     caption_generation,
                     caption_max_side,
-                    vision_model_id,
                     # Must match generate() exactly: the token budget is part of
                     # the key, so omitting it here made every lazy check miss.
                     prompt_system,
@@ -1615,7 +1606,6 @@ class SmartCachedTilePromptGenerator:
         cache_tag,
         negative_prompt_fallback,
         caption_max_side=1344,
-        vision_model_id="Qwen3-VL-4B-FP8",
     ):
         _require_single_image(image, "Tile captioning")
         resolver = SmartTilePromptResolver()
@@ -1649,7 +1639,6 @@ class SmartCachedTilePromptGenerator:
             tile_reference,
             caption_generation,
             caption_max_side,
-            vision_model_id,
             prompt_system,
         )
         cache_key = _prompt_cache_key(image, instruction, context, cache_tag)

@@ -782,14 +782,15 @@ class CacheSafetyTests(unittest.TestCase):
         self.assertEqual(_tensor_fingerprint(first), _tensor_fingerprint(first.clone()))
         self.assertNotEqual(_tensor_fingerprint(first), _tensor_fingerprint(second))
 
-    def test_vision_model_id_changes_cache_context(self):
-        first = SmartCachedTextGenerate._context(
-            1024, "Consistent caption", False, True, "", 1344, "model-a"
+    def test_vision_model_id_stays_in_the_cache_context(self):
+        """The widget is gone; the value must not be. Every caption already on
+        disk was keyed with it, so dropping it would orphan the whole cache."""
+        context = json.loads(
+            SmartCachedTextGenerate._context(
+                1024, "Consistent caption", False, True, "", 1344
+            )
         )
-        second = SmartCachedTextGenerate._context(
-            1024, "Consistent caption", False, True, "", 1344, "model-b"
-        )
-        self.assertNotEqual(first, second)
+        self.assertEqual(context["vision_model_id"], "Qwen3-VL-4B-FP8")
 
     def test_prompt_cache_write_failure_is_reported_not_raised(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -1244,13 +1245,12 @@ class WaterfallRunTests(unittest.TestCase):
         generator = SmartCachedTilePromptGenerator()
         reference = json.dumps({"tile_index": 0, "evidence_class": "structured"})
         simple = generator._key_context(
-            reference, "Consistent caption", 1344, "m", {"caption_detail": "Simple"}
+            reference, "Consistent caption", 1344, {"caption_detail": "Simple"}
         )
         maximum = generator._key_context(
             reference,
             "Consistent caption",
             1344,
-            "m",
             {"caption_detail": "Maximum (every visible item)"},
         )
         self.assertNotEqual(simple, maximum)

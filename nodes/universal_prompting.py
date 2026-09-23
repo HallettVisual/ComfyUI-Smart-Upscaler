@@ -1971,10 +1971,26 @@ class SmartTileJobDirector:
                 "tile_metadata_json": ("STRING", {"forceInput": True}),
                 "global_context": ("STRING", {"forceInput": True, "lazy": True}),
                 "prompt_system": ("SMART_PROMPT_SYSTEM", {"forceInput": True}),
-                "selection_mode": (["single_tile", "all_tiles"], {"default": "single_tile"}),
+                "selection_mode": (
+                    ["all_tiles", "single_tile"],
+                    {
+                        "default": "all_tiles",
+                        "advanced": True,
+                        "label": "Which tiles to prompt (Advanced)",
+                        "tooltip": "Leave on all tiles. single_tile writes a prompt for one tile only and is a way to save captioning time while testing; to test the SAMPLER on one tile, use the Sampler Tile Test Selector instead, which keeps every prompt and audit record intact.",
+                    },
+                ),
                 "tile_number": (
                     "INT",
-                    {"default": 1, "min": 1, "max": 4096, "step": 1},
+                    {
+                        "default": 1,
+                        "min": 1,
+                        "max": 4096,
+                        "step": 1,
+                        "advanced": True,
+                        "label": "Which tile to prompt (Advanced)",
+                        "tooltip": "Only used by single_tile above. This is the tile number shown on the processing grid.",
+                    },
                 ),
                 "base_seed": (
                     "INT",
@@ -1985,7 +2001,13 @@ class SmartTileJobDirector:
                         "control_after_generate": True,
                     },
                 ),
-                "seed_mode": (["increment", "fixed", "hashed"], {"default": "increment"}),
+                "seed_mode": (
+                    ["fixed", "increment", "hashed"],
+                    {
+                        "default": "fixed",
+                        "tooltip": "fixed gives every tile the same seed, which keeps texture consistent from tile to tile - the right choice for an upscale. increment and hashed vary the seed per tile, which varies the texture too.",
+                    },
+                ),
             },
         }
 

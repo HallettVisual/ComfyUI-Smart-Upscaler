@@ -40,7 +40,7 @@ takes an image and a prompt and returns an image can sit there.
 3. Download the models listed in **[docs/MODELS.md](docs/MODELS.md)** — about 13 GB
 4. Copy `workflow/Upscale_Test_Image.png` into your `ComfyUI/input/` folder
 5. Restart ComfyUI
-6. Load `workflow/Smart-Upscaler-Z-Turbo-v1a.json`
+6. Load `workflow/Smart-Upscaler-Z-Turbo-v2.json`
 
 No Python dependencies beyond ComfyUI itself.
 
@@ -224,7 +224,7 @@ dragging correct neighbours with it.
 
 ## The included workflow
 
-`workflow/Smart-Upscaler-Z-Turbo-v1a.json` — Z-Image Turbo with a Tile
+`workflow/Smart-Upscaler-Z-Turbo-v2.json` — Z-Image Turbo with a Tile
 ControlNet. It runs as downloaded.
 
 The optional ESRGAN enlarger ships **unwired on purpose**. Out of the box the

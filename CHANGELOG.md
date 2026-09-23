@@ -1,5 +1,48 @@
 # Changelog
 
+## 1.2.0 — 2026-09-23
+
+**Fewer settings**
+
+- The two finishing nodes are now **one dropdown each**. Color Match shows its
+  Quick Preset and ships on *Match source brightness*; Stitch Tiles shows its
+  Quick Preset and ships on *Photo upscale, seams hidden*. The dials each preset
+  writes moved under Advanced, and a fresh node's dials now hold exactly the
+  values its shipped preset writes.
+- `vision_model_id` is gone from both caption nodes. It named no model — it only
+  namespaced the cache, which `cache_tag` already does. The value it contributed
+  stays in the key, so captions cached before this still match.
+- `max_length`, and the Job Director's `selection_mode` / `tile_number`, moved
+  under Advanced. The Job Director's tile controls duplicate the Sampler Tile
+  Test Selector, which is the one to use.
+- Visible widgets across the eleven nodes: 34 → 21.
+
+**Defaults**
+
+- Tile Planner enlarges with **Lanczos** out of the box instead of an AI upscaler
+  model, so a fresh graph needs no extra download and no extra wire.
+- Tile Job Director selects **all tiles** and uses a **fixed** seed — one seed for
+  every tile keeps texture consistent across seams.
+- `divisible_by` moved under Advanced now that tile sizes are rounded for you.
+
+**Tiles**
+
+- Processed tile sizes are always a multiple of 32. Every sampler latent grid in
+  use is 8, 16 or 32 pixels, and a model that rounds its own working size to 32
+  (Qwen Image 2.1) now returns the tile at exactly the planned size. Settings
+  already aligned to 32 — including `divisible_by 64` — keep their grid, tile
+  count and overlap unchanged.
+
+**Workflows**
+
+- New release workflow: `workflow/Smart-Upscaler-Z-Turbo-v2.json`, replacing
+  v1a. Ships at 2x, carries the new preset-first finishing settings, and renames
+  the `Tiled_Image` wire to `All_Tiles` so it can no longer be confused with the
+  selector's `Tiled_Images_Out`.
+- The shipped master instruction no longer names example objects ("loose hair
+  strands, wires, branches"). Tiles copy whatever their instruction shows them,
+  and a wet-hair portrait once came back full of wires and branches.
+
 ## 1.1.0 — 2026-08-11
 
 **Renamed**

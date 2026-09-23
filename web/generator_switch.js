@@ -48,10 +48,11 @@ function slotNumber(input) {
   return parseInt(input.name.slice(GENERATOR_PREFIX.length), 10);
 }
 
-function containingGroupTitle(graph, origin) {
+function containingGroupTitle(graph, origin, pattern) {
   // The largest titled group holding the upstream node - generator chains live
   // in top-level groups named after the model ("Flux 1", "SDXL"), so that title
   // beats the feeding node's own name (usually just "VAE Decode").
+  // With a pattern, only groups whose title matches it are considered.
   const groups = graph?._groups || graph?.groups || [];
   const centerX = origin.pos[0] + (origin.size?.[0] || 0) / 2;
   const centerY = origin.pos[1] + (origin.size?.[1] || 0) / 2;
@@ -59,7 +60,9 @@ function containingGroupTitle(graph, origin) {
   let bestArea = -1;
   for (const group of groups) {
     const bounds = group._bounding || group.bounding;
-    if (!bounds || !String(group.title || "").trim()) continue;
+    const title = String(group.title || "").trim();
+    if (!bounds || !title) continue;
+    if (pattern && !pattern.test(title)) continue;
     const [x, y, width, height] = bounds;
     if (centerX < x || centerY < y || centerX > x + width || centerY > y + height) continue;
     const area = width * height;
@@ -94,22 +97,53 @@ function cleanTitle(value) {
     .trim();
 }
 
+function tidyName(value) {
+  // Generator groups are titled for the canvas, not for a dropdown row:
+  // "GENERATOR 1 - Z-Image Turbo + Tile ControlNet  [WORKING]".
+  return String(value || "")
+    .replace(/^GENERATOR\s*\d+\s*[-–—:]\s*/i, "")
+    .replace(/\s*\[[^\]]*\]\s*$/, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function railName(origin) {
+  // A Set_ rail is named by hand for one chain ("Set_Qwen 2.1"), so it beats
+  // any box that happens to enclose it - a chain parked inside a group called
+  // "Models" must not come out named Models.
+  if (String(origin?.type || "") !== "SetNode") return null;
+  return cleanTitle(origin.title || origin.widgets?.[0]?.value) || null;
+}
+
+function derivedLabel(node, input) {
+  if (input.link == null) return null;
+  const link = node.graph?.links?.[input.link];
+  const linked = link ? node.graph.getNodeById(link.origin_id) : null;
+  const origin = linked ? resolveReroute(node.graph, linked) : null;
+  if (!origin) return null;
+  return (
+    tidyName(containingGroupTitle(node.graph, origin, /^GENERATOR/i)) ||
+    railName(origin) ||
+    tidyName(containingGroupTitle(node.graph, origin)) ||
+    cleanTitle(origin.title) ||
+    cleanTitle(linked.title) ||
+    origin.type ||
+    null
+  );
+}
+
 function chainLabel(node, input) {
   if (input.label && input.label !== input.name) return input.label;
-  if (input.link != null) {
-    const link = node.graph?.links?.[input.link];
-    const linked = link ? node.graph.getNodeById(link.origin_id) : null;
-    const origin = linked ? resolveReroute(node.graph, linked) : null;
-    if (origin) {
-      return (
-        containingGroupTitle(node.graph, origin) ||
-        cleanTitle(origin.title) ||
-        cleanTitle(linked.title) ||
-        origin.type
-      );
-    }
-  }
-  return null;
+  return derivedLabel(node, input);
+}
+
+function relabelSlot(node, input) {
+  // A saved label names the chain that WAS in this slot. Plugging a different
+  // generator in must not leave the old model's name on it - that is how a
+  // slot ends up reading "Flux 1 Dev" while it runs Qwen.
+  const label = derivedLabel(node, input);
+  if (label) input.label = label;
+  else delete input.label;
 }
 
 function refreshGeneratorChoices(node) {
@@ -188,10 +222,27 @@ app.registerExtension({
       refreshGeneratorChoices(this);
     };
 
+    // Saved labels survive a reload on purpose, so a name someone chose by hand
+    // is not thrown away. This re-derives every slot from what is wired to it
+    // now, for graphs whose labels already went stale.
+    const originalMenu = nodeType.prototype.getExtraMenuOptions;
+    nodeType.prototype.getExtraMenuOptions = function (canvas, options) {
+      originalMenu?.apply(this, arguments);
+      options?.push({
+        content: "Refresh generator names",
+        callback: () => {
+          for (const { input } of generatorSlots(this)) relabelSlot(this, input);
+          refreshGeneratorChoices(this);
+          this.setDirtyCanvas(true, true);
+        },
+      });
+    };
+
     const originalConnections = nodeType.prototype.onConnectionsChange;
     nodeType.prototype.onConnectionsChange = function (type, index, connected, linkInfo, ioSlot) {
       originalConnections?.apply(this, arguments);
       if (ioSlot?.name?.startsWith(GENERATOR_PREFIX) && ioSlot.name !== NUMBER_INPUT) {
+        relabelSlot(this, ioSlot);
         normalizeGeneratorInputs(this);
         refreshGeneratorChoices(this);
       }

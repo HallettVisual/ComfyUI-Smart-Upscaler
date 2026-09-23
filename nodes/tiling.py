@@ -324,6 +324,17 @@ def _round_up(value, multiple):
     return int(math.ceil(value / multiple) * multiple)
 
 
+# Sampler latent grids are 8, 16, or 32 pixels depending on the model family,
+# and some models round the size they work at up to 32 by themselves. A tile
+# that is already a multiple of 32 comes back at exactly the size the stitcher
+# planned for, whichever model rendered it.
+SAMPLER_TILE_ALIGNMENT = 32
+
+
+def _sampler_alignment(divisible_by):
+    return _round_up(max(1, int(divisible_by)), SAMPLER_TILE_ALIGNMENT)
+
+
 def _adaptive_axis(length, scale_factor, min_tile_size, max_tile_size, overlap, divisible_by):
     scaled_length = max(1, round(length * scale_factor))
     effective_min = _round_up(min_tile_size, divisible_by)
@@ -543,7 +554,16 @@ class SmartAdaptiveTilePlanner:
                     },
                 ),
                 "scale_factor": ("FLOAT", {"default": 2.0, "min": 1.0, "max": 12.0, "step": 0.25}),
-                "divisible_by": ("INT", {"default": 16, "min": 1, "max": 256, "step": 1}),
+                "divisible_by": (
+                    "INT",
+                    {
+                        "default": 32,
+                        "min": 1,
+                        "max": 256,
+                        "step": 1,
+                        "tooltip": "Processed tile sizes are rounded up to this, and always to a multiple of 32 so every sampler hands the tile back at the planned size.",
+                    },
+                ),
                 "padding_mode": (["edge", "zero"], {"default": "edge"}),
             },
         }
@@ -565,6 +585,10 @@ class SmartAdaptiveTilePlanner:
             raise ValueError("Feather must be less than or equal to overlap.")
         if overlap >= max_tile_size:
             raise ValueError("Overlap must be smaller than maximum tile size.")
+
+        # Applied once, before any geometry is derived, so the grid, the overlap
+        # and the recorded value all describe the same rounding.
+        divisible_by = _sampler_alignment(divisible_by)
 
         batch, image_height, image_width, _ = image.shape
         x_axis = _adaptive_axis(

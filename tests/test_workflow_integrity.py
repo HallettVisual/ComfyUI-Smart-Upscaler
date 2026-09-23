@@ -1,6 +1,6 @@
 """Structural integrity of the shipped workflow files.
 
-Smart-Upscaler-Z-Turbo-v1.json is the workflow shipped to users. These checks
+Smart-Upscaler-Z-Turbo-v2.json is the workflow shipped to users. These checks
 catch silent JSON-graph breakage: dangling links, GET nodes with no matching
 SET, and Smart node types that are not registered.
 """
@@ -12,8 +12,10 @@ import unittest
 import nodes as node_registry
 
 WORKFLOW_DIR = Path(__file__).resolve().parents[1] / "workflow"
-RELEASE_WORKFLOW = "Smart-Upscaler-Z-Turbo-v1a.json"
-WORKFLOW_FILES = (RELEASE_WORKFLOW,)
+RELEASE_WORKFLOW = "Smart-Upscaler-Z-Turbo-v2.json"
+# v1a is the previous release. It is no longer shipped, but it stays checked so
+# an accidental edit to it cannot pass unnoticed.
+WORKFLOW_FILES = (RELEASE_WORKFLOW, "Smart-Upscaler-Z-Turbo-v1a.json")
 
 
 def _load(name):

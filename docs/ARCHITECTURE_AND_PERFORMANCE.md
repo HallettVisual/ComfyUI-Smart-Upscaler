@@ -5,7 +5,7 @@ the caches are keyed, and where the performance actually goes.
 
 ## Active Scope
 
-The release workflow is `workflow/Smart-Upscaler-Z-Turbo-v1a.json`. The goal is a
+The release workflow is `workflow/Smart-Upscaler-Z-Turbo-v2.json`. The goal is a
 ComfyUI-native regional prompt upscaler — not a model loader and not a
 replacement sampler stack. The image model block is an example and stays
 externally replaceable: anything that takes a picture and a prompt and returns a
@@ -29,7 +29,7 @@ picture can go in its place.
 - Known false detections are analysis constraints, never diffusion negatives. Both global and local cache workers reject matching whole terms or phrases and retry once with the original full instruction. If the local VLM repeats a confirmed false concept, deterministic code removes the affected caption clause and revalidates; sampling still stops if no safe, meaningful local or target caption remains.
 - `Use User Request only (no image analysis)` maps to `direct_user` and must remain a true lazy bypass. Neither global nor tile VLM generation executes, and the positive prompt equals the User Request, or the preset's short default action when the request is blank.
 - Model loaders, conditioning, scheduler, sampler, and decoder remain external and replaceable. Smart orchestration nodes must not assume Klein, Flux Dev, or SDXL internals.
-- Overlap and feather settings are specified in final output pixels. Tile dimensions are rounded to `divisible_by`.
+- Overlap and feather settings are specified in final output pixels. Tile dimensions are rounded up to `divisible_by`, and then up to a multiple of 32: every sampler latent grid in use is 8, 16, or 32 pixels, and a model that snaps its own working size to 32 (Qwen Image 2.1) then returns the tile at exactly the planned size. Settings that are already 32-aligned keep their grid unchanged.
 - The processing diagnostic is drawn over the enlarged baseline. The planner also exposes the same baseline without an overlay so workflows can display both views independently. Display downscaling must never alter tile metadata or generated images.
 
 ## Persistent Caches

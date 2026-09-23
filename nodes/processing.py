@@ -290,10 +290,10 @@ class SmartTileMergePartialBatch:
                 raise ValueError(
                     f"Processed tile {tile_index} must be "
                     f"1x{target_height}x{target_width}x{source_batch.shape[3]} "
-                    f"(height x width), but received {received}. If the two sizes are "
-                    "swapped or rounded, check that the sampler's latent width and "
-                    "height come from this exact tile image and are not rounded by "
-                    "the model's latent size rules."
+                    f"(height x width), but received {received}. Check that the "
+                    "sampler's latent size comes from this exact tile image, and "
+                    "that no reference resolution widget resized it first: Qwen "
+                    "Image 2.1 needs its resolution set to 0 to keep the tile size."
                 )
             baseline[tile_index] = processed_image[0].to(
                 device=baseline.device,

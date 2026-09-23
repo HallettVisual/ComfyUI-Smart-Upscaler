@@ -222,6 +222,39 @@ class FinalizerPresetTests(unittest.TestCase):
         self.assertIn("Fade the fix", preset["consistency_mode"])
 
 
+class PresetFirstDefaultTests(unittest.TestCase):
+    """Both finishing nodes now show one dropdown and hide their dials.
+
+    A fresh node must therefore already hold the values its shipped preset
+    would write - otherwise the dial the user cannot see disagrees with the
+    label they can.
+    """
+
+    @staticmethod
+    def _defaults(node):
+        spec = node.INPUT_TYPES()
+        fields = {**spec["required"], **spec.get("optional", {})}
+        return {name: value[1] for name, value in fields.items() if len(value) > 1}
+
+    def test_finalizer_defaults_match_its_shipped_preset(self):
+        defaults = self._defaults(SmartTileFinalizer)
+        shipped = defaults["finish_preset"]["default"]
+        self.assertEqual(shipped, "Photo upscale, seams hidden (start here)")
+        for name, value in FINISH_PRESETS[shipped].items():
+            self.assertEqual(defaults[name]["default"], value, name)
+            self.assertTrue(defaults[name].get("advanced"), name)
+
+    def test_color_match_defaults_match_its_shipped_preset(self):
+        defaults = self._defaults(SmartTileColorMatch)
+        shipped = defaults["color_preset"]["default"]
+        self.assertEqual(shipped, "Match source brightness (recommended)")
+        method, strength = COLOR_MATCH_PRESETS[shipped]
+        self.assertEqual(defaults["color_match_method"]["default"], method)
+        self.assertEqual(defaults["color_match_strength"]["default"], strength)
+        self.assertTrue(defaults["color_match_method"].get("advanced"))
+        self.assertTrue(defaults["color_match_strength"].get("advanced"))
+
+
 class GradientSeamFixTests(unittest.TestCase):
     """A tile that only disagrees with its neighbor on one side cannot be fixed
     by a constant shift; the gradient mode corrects exactly the seam."""

@@ -44,7 +44,7 @@ class SmartUpscalerPipelineTests(unittest.TestCase):
         workflow_path = (
             Path(__file__).resolve().parents[1]
             / "workflow"
-            / "Smart-Upscaler-Z-Turbo-v1.json"
+            / "Smart-Upscaler-Z-Turbo-v2.json"
         )
         workflow = json.loads(workflow_path.read_text(encoding="utf-8"))
         smart_types = {
@@ -1623,7 +1623,10 @@ EXACT-TILE PASS: Use only exact-tile evidence and spatially matching master cont
         metadata = json.loads(metadata_json)
         self.assertEqual(metadata["upscale_method"], UPSCALE_METHODS[1])
         self.assertEqual(full_image.shape, (1, 8, 12, 3))
-        self.assertEqual(tiles.shape[1:3], (8, 12))
+        self.assertEqual(
+            tiles.shape[1:3],
+            (metadata["output_tile_height"], metadata["output_tile_width"]),
+        )
         self.assertIn("Lanczos", preflight)
         self.assertEqual(
             planner.check_lazy_status(
@@ -2024,14 +2027,51 @@ EXACT-TILE PASS: Use only exact-tile evidence and spatially matching master cont
         self.assertEqual(result.shape, (1, 208, 320, 3))
         self.assertTrue(torch.allclose(result, torch.ones_like(result), atol=1e-6))
 
+    def test_planner_always_rounds_sampler_tiles_to_a_multiple_of_32(self):
+        # Qwen Image 2.1 rounds its own working size to 32 and hands the tile
+        # back at that size, so anything less would not survive the stitcher.
+        image = torch.zeros((1, 300, 420, 3), dtype=torch.float32)
+        _, _, _, metadata_json = SmartAdaptiveTilePlanner().plan(
+            image,
+            min_tile_size=300,
+            max_tile_size=520,
+            overlap=24,
+            feather=12,
+            scale_factor=2.0,
+            divisible_by=16,
+            padding_mode="edge",
+        )
+        metadata = json.loads(metadata_json)
+
+        self.assertEqual(metadata["divisible_by"], 32)
+        self.assertEqual(metadata["output_tile_width"] % 32, 0)
+        self.assertEqual(metadata["output_tile_height"] % 32, 0)
+
+        _, _, _, aligned_json = SmartAdaptiveTilePlanner().plan(
+            image,
+            min_tile_size=300,
+            max_tile_size=520,
+            overlap=24,
+            feather=12,
+            scale_factor=2.0,
+            divisible_by=64,
+            padding_mode="edge",
+        )
+        aligned = json.loads(aligned_json)
+
+        # A setting that is already 32-aligned keeps its own grid untouched.
+        self.assertEqual(aligned["divisible_by"], 64)
+        self.assertEqual(aligned["output_tile_width"] % 64, 0)
+        self.assertEqual(aligned["output_tile_height"] % 64, 0)
+
     def test_partial_merge_replaces_selected_tile_and_fills_the_rest(self):
-        image = torch.zeros((1, 8, 12, 3), dtype=torch.float32)
+        image = torch.zeros((1, 32, 48, 3), dtype=torch.float32)
         source_tiles, _, _, metadata_json = SmartAdaptiveTilePlanner().plan(
             image,
-            min_tile_size=8,
-            max_tile_size=16,
-            overlap=4,
-            feather=2,
+            min_tile_size=32,
+            max_tile_size=64,
+            overlap=16,
+            feather=8,
             scale_factor=2.0,
             divisible_by=4,
             padding_mode="edge",

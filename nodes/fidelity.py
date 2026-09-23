@@ -139,9 +139,10 @@ class SmartTileColorMatch:
                 "color_match_method": (
                     ["none", "luminance", "local_tone", "rgb_mean", "rgb_mean_std"],
                     {
-                        "default": "none",
+                        "default": "luminance",
+                        "advanced": True,
                         "label": "Match Colors to the Original",
-                        "tooltip": "Off by default. none: keep generated colors. luminance: match the original's overall brightness (safest). local_tone: even out brightness region by region, keeping generated color and detail. rgb_mean: match average color. rgb_mean_std: match color and contrast fully.",
+                        "tooltip": "Set by the Quick Preset. none: keep generated colors. luminance: match the original's overall brightness (safest). local_tone: even out brightness region by region, keeping generated color and detail. rgb_mean: match average color. rgb_mean_std: match color and contrast fully.",
                     },
                 ),
                 "color_match_strength": (
@@ -152,6 +153,7 @@ class SmartTileColorMatch:
                         "max": 100,
                         "step": 1,
                         "display": "slider",
+                        "advanced": True,
                         "tooltip": "0 keeps the generated tile untouched; 100 fully applies the chosen match to the source.",
                     },
                 ),
@@ -160,9 +162,9 @@ class SmartTileColorMatch:
                 "color_preset": (
                     list(COLOR_MATCH_PRESETS),
                     {
-                        "default": "Manual (use dials below)",
+                        "default": "Match source brightness (recommended)",
                         "label": "Quick Preset",
-                        "tooltip": "One-click settings that fill in the two dials above and stay shown as a label. Pick No color change for day-to-night or style edits, Match source brightness for faithful photo upscales. Fine-tune the dials freely afterward.",
+                        "tooltip": "The only setting most pictures need. It fills in the two dials in Advanced and stays shown as a label. Pick No color change for day-to-night or style edits, Match source brightness for faithful photo upscales.",
                     },
                 ),
             },

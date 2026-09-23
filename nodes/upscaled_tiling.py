@@ -203,9 +203,9 @@ class SmartUpscaledTilePlanner:
                 "upscale_method": (
                     list(UPSCALE_METHODS),
                     {
-                        "default": UPSCALE_METHODS[0],
+                        "default": UPSCALE_METHODS[1],
                         "label": "How Should the Source Be Enlarged?",
-                        "tooltip": "AI models can add detail but may round small objects. Standard resize methods preserve source geometry and need no model.",
+                        "tooltip": "Lanczos is the default and needs no model: it enlarges the source cleanly and lets the sampler add the detail. Pick the AI upscaler only when you have a 4x model you trust - it can add detail here, but it also rounds small objects before the sampler ever sees them.",
                     },
                 ),
                 "min_tile_size": (
@@ -260,7 +260,14 @@ class SmartUpscaledTilePlanner:
                 ),
                 "divisible_by": (
                     "INT",
-                    {"default": 16, "min": 1, "max": 256, "step": 1},
+                    {
+                        "default": 32,
+                        "min": 1,
+                        "max": 256,
+                        "step": 1,
+                        "advanced": True,
+                        "tooltip": "Processed tile sizes are rounded up to this, and always to a multiple of 32 so every sampler hands the tile back at the planned size.",
+                    },
                 ),
                 "upscale_batch_size": (
                     "INT",
@@ -381,6 +388,7 @@ class SmartUpscaledTilePlanner:
         metadata = json.loads(metadata_json)
         target_width = int(metadata["output_tile_width"])
         target_height = int(metadata["output_tile_height"])
+        tile_alignment = int(metadata["divisible_by"])
         expected_shape = (
             int(source_tiles.shape[0]),
             target_height,
@@ -393,7 +401,7 @@ class SmartUpscaledTilePlanner:
             "overlap": int(overlap),
             "feather": int(feather),
             "scale_factor": float(scale_factor),
-            "divisible_by": int(divisible_by),
+            "divisible_by": tile_alignment,
             "padding_mode": str(padding_mode),
             "target_width": target_width,
             "target_height": target_height,
@@ -491,7 +499,7 @@ class SmartUpscaledTilePlanner:
             f"Output: {int(metadata['output_width'])} x {int(metadata['output_height'])}\n"
             f"Grid: {int(metadata['grid_columns'])} columns x {int(metadata['grid_rows'])} rows "
             f"= {int(metadata['tile_count'])} tiles\n"
-            f"Sampler tiles: {target_width} x {target_height} | divisible by {int(divisible_by)}\n"
+            f"Sampler tiles: {target_width} x {target_height} | divisible by {tile_alignment}\n"
             f"Overlap: {int(overlap)} px | Feather: {int(feather)} px\n"
             f"Scale: {float(scale_factor):g}x | Enlargement: {str(upscale_method)}"
             f"{f' | model native {float(getattr(upscale_model, 'scale', 1.0)):g}x' if str(upscale_method) == UPSCALE_METHODS[0] else ''}\n"

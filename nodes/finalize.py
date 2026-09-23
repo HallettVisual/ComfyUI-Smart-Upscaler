@@ -278,6 +278,7 @@ class SmartTileFinalizer:
                     list(REFERENCE_BEHAVIORS),
                     {
                         "default": REFERENCE_BEHAVIORS[0],
+                        "advanced": True,
                         "label": "1. Follow the original, or keep the new look?",
                         "tooltip": "The most important setting here.\n\nStay close to the original: every tile is pulled back toward the source's own colour and brightness. Use this whenever the source was already a correct picture - it is also the strongest cure for visible tiles, because it gives them all the same starting tone.\n\nKeep the new look: each tile keeps the colour and brightness the model gave it, and only bent shapes are corrected. Use this when you deliberately changed the picture - a style, a time of day, a repair of a broken source.",
                     },
@@ -285,11 +286,12 @@ class SmartTileFinalizer:
                 "structure_preservation": (
                     "INT",
                     {
-                        "default": 55,
+                        "default": 50,
                         "min": 0,
                         "max": 100,
                         "step": 1,
                         "display": "slider",
+                        "advanced": True,
                         "label": "2. How closely to follow it",
                         "tooltip": "How strongly setting 1 is applied. Around 50 is a normal photo upscale. Below about 20 it barely does anything, so a low number here undoes setting 1 - raise it if the result drifts from your original.",
                     },
@@ -297,7 +299,8 @@ class SmartTileFinalizer:
                 "detail_support": (
                     list(DETAIL_FREEDOM),
                     {
-                        "default": "Balanced",
+                        "default": "Keep more new detail",
+                        "advanced": True,
                         "label": "3. How much of the model's new detail to keep",
                         "tooltip": "Settings 1 and 2 pull the picture back toward the source. This decides how much of the fine detail the model just generated survives that pull.\n\nKeep more new detail is the right choice when the model genuinely improved the texture and you only want the source to fix colour and shape.",
                     },
@@ -314,11 +317,12 @@ class SmartTileFinalizer:
                 "cross_tile_consistency": (
                     "INT",
                     {
-                        "default": 35,
+                        "default": 60,
                         "min": 0,
                         "max": 100,
                         "step": 5,
                         "display": "slider",
+                        "advanced": True,
                         "label": "4. Hide the joins between tiles",
                         "tooltip": "Evens out colour and brightness differences between neighbouring tiles, using the strip of picture they share. 0 is off; 60 is strong.\n\nThis fixes tiles that came out different SHADES. It cannot fix tiles that generated different TEXTURE - if you can see a grid in flat areas like water or sky, that comes from the prompt, so check the prompt log first.",
                     },
@@ -328,7 +332,8 @@ class SmartTileFinalizer:
                 "consistency_mode": (
                     list(CONSISTENCY_MODES),
                     {
-                        "default": CONSISTENCY_MODES[0],
+                        "default": CONSISTENCY_MODES[1],
+                        "advanced": True,
                         "label": "5. How to hide them",
                         "tooltip": "Shift the whole tile evenly: one correction for the whole tile. Fine when a tile is uniformly off.\n\nFade toward the edge that disagrees: the correction is strongest at the join and fades away across the tile, so a tile that only mismatches on one side is fixed there instead of everywhere. This is the better choice whenever you can actually see the joins.",
                     },
@@ -336,9 +341,9 @@ class SmartTileFinalizer:
                 "finish_preset": (
                     list(FINISH_PRESETS),
                     {
-                        "default": "Manual - I set the dials myself",
+                        "default": "Photo upscale, seams hidden (start here)",
                         "label": "Quick Preset - sets 1 to 5 for you",
-                        "tooltip": "Pick one of these FIRST - it fills in every dial above, then stays on screen as a label so you can see what you chose and adjust from there.\n\nPhoto upscale, seams hidden: start here for a normal upscale of a picture that was already correct.\n\nUse the 'I changed the look' presets when you asked for a style, a time of day, or a repair, so your new look is not pulled back to the original.",
+                        "tooltip": "The only setting most pictures need. It fills in dials 1 to 5 in Advanced, then stays on screen as a label so you can see what you chose and adjust from there.\n\nPhoto upscale, seams hidden: start here for a normal upscale of a picture that was already correct.\n\nUse the 'I changed the look' presets when you asked for a style, a time of day, or a repair, so your new look is not pulled back to the original.",
                     },
                 ),
             },
