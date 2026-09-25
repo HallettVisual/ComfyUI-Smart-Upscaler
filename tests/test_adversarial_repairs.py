@@ -627,8 +627,11 @@ class PromptRecoveryTests(unittest.TestCase):
                     "unconfirmed-cabin-does-not-abort",
                     "artifacts, seams",
                 )
+                # A guessed prompt is never cached, so the next run asks again.
+                self.assertEqual(list(Path(cache_directory).rglob("*.json")), [])
         self.assertEqual(model.calls, 3)
         self.assertIn("CONSERVATIVE-FALLBACK", result[4])
+        self.assertIn("NOT SAVED", result[4])
         self.assertNotIn("cabin", result[0].casefold())
         self.assertNotIn("building", result[0].casefold())
 

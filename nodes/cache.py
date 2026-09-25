@@ -43,6 +43,12 @@ from .regions import (
 
 
 CACHE_SCHEMA_VERSION = 2
+# ComfyUI's Qwen3-VL tokenizer appends an empty <think></think> block when
+# thinking=False. The Instruct model was never trained on it: tiles opened with
+# stray <|im_start|> tokens, some looped to max_length (60 s each), failed to
+# parse and fell back to a guessed prompt. thinking=True leaves the plain chat
+# template - it does not make the Instruct model reason.
+_PLAIN_CHAT_TEMPLATE = True
 DEFAULT_ESRGAN_CACHE_MAX_GB = 2.0
 DEFAULT_CACHE_FREE_RESERVE_GB = 2.0
 # The text-prompt cache is bounded too: no cache in this tool may grow forever.
@@ -184,6 +190,15 @@ def _tile_context_fallback(reference):
 
 
 _EXPECTED_OBJECT_MIN_OVERLAP = 0.12
+
+
+def _is_conservative_fallback(caption):
+    """True for a guessed tile prompt that older versions saved to the cache."""
+    try:
+        payload = json.loads(str(caption))
+    except json.JSONDecodeError:
+        return False
+    return isinstance(payload, dict) and "recovery_reason" in payload
 
 
 def _object_identity_tokens(candidate):
@@ -787,6 +802,98 @@ def _write_prompt(cache_key, text, cache_tag):
     return path, ""
 
 
+# Reuse matches an edited copy of a picture already run: same size, and a 16x16
+# thumbnail within this mean difference (0-1 scale). Retouching, re-saving and
+# small fixes stay well under it; a different photo lands far above it.
+_REUSE_MAX_DIFFERENCE = 0.06
+_REUSE_RECORDS_PER_SLOT = 8
+
+
+def _reuse_thumbnail(image):
+    small = torch.nn.functional.interpolate(
+        image[:1].movedim(-1, 1).float(), size=(16, 16), mode="area"
+    )
+    return [round(float(value), 3) for value in small.flatten().cpu()]
+
+
+def _reuse_slot(kind, settings):
+    """Everything reuse must match exactly; the thumbnail decides the rest."""
+    payload = {"schema": CACHE_SCHEMA_VERSION, "kind": kind, "settings": settings}
+    encoded = json.dumps(payload, sort_keys=True, default=str).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()[:32]
+
+
+def _reuse_records(slot):
+    records = []
+    for path in (_cache_root() / "reuse").glob(f"{slot}_*.json"):
+        try:
+            record = json.loads(path.read_text(encoding="utf-8"))
+            modified = path.stat().st_mtime
+        except (OSError, json.JSONDecodeError):
+            continue
+        if (
+            isinstance(record, dict)
+            and record.get("schema") == CACHE_SCHEMA_VERSION
+            and isinstance(record.get("thumbnail"), list)
+            and isinstance(record.get("text"), str)
+        ):
+            records.append((modified, path, record))
+    records.sort(key=lambda item: item[0], reverse=True)
+    return records
+
+
+def _read_reusable(slot, image):
+    """The saved text of the closest-looking earlier picture, or None."""
+    thumbnail = _reuse_thumbnail(image)
+    best = None
+    for _, _, record in _reuse_records(slot):
+        saved = record["thumbnail"]
+        if len(saved) != len(thumbnail):
+            continue
+        difference = sum(abs(a - b) for a, b in zip(saved, thumbnail)) / len(thumbnail)
+        if difference <= _REUSE_MAX_DIFFERENCE and (best is None or difference < best[0]):
+            best = (difference, record["text"])
+    return None if best is None else best[1]
+
+
+def _write_reusable(slot, image, text):
+    """Keep this picture's text available for a later edited copy. Never fatal."""
+    directory = _cache_root() / "reuse"
+    thumbnail = _reuse_thumbnail(image)
+    records = _reuse_records(slot)
+    # The same picture again replaces its own record instead of piling up.
+    path = next(
+        (path for _, path, record in records if record["thumbnail"] == thumbnail),
+        directory / f"{slot}_{uuid.uuid4().hex[:12]}.json",
+    )
+    temporary = directory / f".{path.stem}.{uuid.uuid4().hex}.tmp"
+    payload = {
+        "schema": CACHE_SCHEMA_VERSION,
+        "created_utc": datetime.now(timezone.utc).isoformat(),
+        "thumbnail": thumbnail,
+        "text": str(text),
+    }
+    try:
+        directory.mkdir(parents=True, exist_ok=True)
+        temporary.write_text(json.dumps(payload, ensure_ascii=True), encoding="utf-8")
+        temporary.replace(path)
+        for _, old_path, _ in [r for r in records if r[1] != path][_REUSE_RECORDS_PER_SLOT - 1 :]:
+            _remove_file_quietly(old_path)
+        _prune_prompt_cache(directory)
+    except OSError:
+        _remove_file_quietly(temporary)
+
+
+def _reused_text(slot, image, prompt_system, problem):
+    """Saved text for an edited copy of this picture, when the Director allows reuse."""
+    if not isinstance(prompt_system, dict) or not prompt_system.get("prompt_reuse"):
+        return None
+    text = _read_reusable(slot, image)
+    if text is None or problem(text):
+        return None
+    return text
+
+
 def _whole_image_context_review(prompt_text, prompt_system):
     if not isinstance(prompt_system, dict) or not prompt_system.get("unified_instruction_ui"):
         return str(prompt_text)
@@ -841,7 +948,7 @@ class SmartCachedTextGenerate:
                         "default": False,
                         "advanced": True,
                         "label": "Allow Model Reasoning (Advanced)",
-                        "tooltip": "Leave off for a clean caption-only response.",
+                        "tooltip": "No effect with the Qwen3-VL Instruct vision model, which does not reason. Kept so saved workflows still load.",
                     },
                 ),
                 "use_default_template": (
@@ -1180,6 +1287,7 @@ class SmartCachedTextGenerate:
             analysis_max_side,
         )
         if cache_mode == "read_write":
+            reuse_slot = _reuse_slot("brief", [list(image.shape[1:3]), prompt, context, cache_tag])
             prompt, measured = self._measured_augmentation(image, prompt, prompt_system)
             vision_image = _analysis_image(image, analysis_max_side)
             cache_key = _prompt_cache_key(vision_image, prompt, context, cache_tag)
@@ -1187,6 +1295,14 @@ class SmartCachedTextGenerate:
             if cached is not None and not _global_caption_problem(
                 cached, prompt_system, measured
             ):
+                return []
+            reused = _reused_text(
+                reuse_slot,
+                image,
+                prompt_system,
+                lambda text: _global_caption_problem(text, prompt_system, measured),
+            )
+            if reused is not None:
                 return []
         return ["clip"]
 
@@ -1200,6 +1316,7 @@ class SmartCachedTextGenerate:
             max_length, sampling_mode, thinking, use_default_template, key_context,
             analysis_max_side,
         )
+        reuse_slot = _reuse_slot("brief", [list(image.shape[1:3]), prompt, context, cache_tag])
         prompt, measured = self._measured_augmentation(image, prompt, prompt_system)
         vision_image = _analysis_image(image, analysis_max_side)
         cache_key = _prompt_cache_key(vision_image, prompt, context, cache_tag)
@@ -1208,10 +1325,23 @@ class SmartCachedTextGenerate:
             if cached is not None and not _global_caption_problem(
                 cached, prompt_system, measured
             ):
+                _write_reusable(reuse_slot, image, cached)
                 return (
                     cached,
                     f"Prompt cache HIT | {cache_key[:12]}",
                     _whole_image_context_review(cached, prompt_system),
+                )
+            reused = _reused_text(
+                reuse_slot,
+                image,
+                prompt_system,
+                lambda text: _global_caption_problem(text, prompt_system, measured),
+            )
+            if reused is not None:
+                return (
+                    reused,
+                    "Prompt cache REUSED | saved summary of an edited copy of this picture",
+                    _whole_image_context_review(reused, prompt_system),
                 )
         if clip is None:
             raise ValueError("The prompt model was not evaluated for a cache miss.")
@@ -1222,7 +1352,7 @@ class SmartCachedTextGenerate:
                 image=vision_image,
                 skip_template=not use_default_template,
                 min_length=1,
-                thinking=thinking,
+                thinking=_PLAIN_CHAT_TEMPLATE,
             )
             generated_ids = clip.generate(
                 tokens,
@@ -1318,6 +1448,7 @@ class SmartCachedTextGenerate:
             )
         if cache_mode != "bypass":
             _, write_error = _write_prompt(cache_key, text, cache_tag)
+            _write_reusable(reuse_slot, image, text)
             if write_error:
                 return (
                     text,
@@ -1456,6 +1587,46 @@ class SmartCachedTilePromptGenerator:
             sort_keys=True,
         )
 
+    @classmethod
+    def _reuse_slot(cls, tile_reference, prompt_system, caption_max_side, cache_tag):
+        # The tile's place in the grid and the user's settings - never its
+        # pixels or its size in the input picture. Re-running a finished 8K
+        # result at 1x keeps the grid of the 6x run that made it, while every
+        # input-pixel coordinate changes; the thumbnail still has to match.
+        try:
+            reference = json.loads(str(tile_reference))
+        except json.JSONDecodeError:
+            reference = {}
+        system = prompt_system if isinstance(prompt_system, dict) else {}
+        return _reuse_slot(
+            "tile",
+            {
+                "tile": [reference.get(key) for key in ("tile_id", "row", "column")],
+                "system": [
+                    system.get(key)
+                    for key in (
+                        "workflow_instruction",
+                        "user_request",
+                        "known_false_detections",
+                        "caption_detail",
+                        "prompt_format",
+                    )
+                ],
+                "max_length": cls._caption_token_budget(prompt_system),
+                "caption_max_side": int(caption_max_side),
+                "cache_tag": str(cache_tag).strip(),
+            },
+        )
+
+    def _reused_caption(self, image, tile_reference, prompt_system, caption_max_side, cache_tag):
+        return _reused_text(
+            self._reuse_slot(tile_reference, prompt_system, caption_max_side, cache_tag),
+            image,
+            prompt_system,
+            lambda text: _is_conservative_fallback(text)
+            or self._caption_problem(text, tile_reference, prompt_system),
+        )
+
     @staticmethod
     def _deterministic_uniform_caption(tile_reference):
         """Skip the vision model for uniform tiles with a canonical surface.
@@ -1535,7 +1706,7 @@ class SmartCachedTilePromptGenerator:
             image=image,
             skip_template=False,
             min_length=1,
-            thinking=False,
+            thinking=_PLAIN_CHAT_TEMPLATE,
         )
         generated_ids = clip.generate(
             tokens,
@@ -1588,9 +1759,15 @@ class SmartCachedTilePromptGenerator:
                 cache_tag,
             )
             cached = _read_prompt(cache_key)
-            if cached is not None and not self._caption_problem(
-                cached, tile_reference, prompt_system
+            if (
+                cached is not None
+                and not _is_conservative_fallback(cached)
+                and not self._caption_problem(cached, tile_reference, prompt_system)
             ):
+                return []
+            if self._reused_caption(
+                caption_image, tile_reference, prompt_system, caption_max_side, cache_tag
+            ) is not None:
                 return []
         return ["clip"]
 
@@ -1646,12 +1823,23 @@ class SmartCachedTilePromptGenerator:
         cache_status = "Tile caption cache BYPASS"
         if cache_mode == "read_write":
             caption = _read_prompt(cache_key)
-            if caption is not None and not self._caption_problem(
-                caption, tile_reference, prompt_system
+            if (
+                caption is not None
+                and not _is_conservative_fallback(caption)
+                and not self._caption_problem(caption, tile_reference, prompt_system)
             ):
                 cache_status = f"Tile caption cache HIT | {cache_key[:12]}"
+                _write_reusable(
+                    self._reuse_slot(tile_reference, prompt_system, caption_max_side, cache_tag),
+                    image,
+                    caption,
+                )
             else:
-                caption = None
+                caption = self._reused_caption(
+                    image, tile_reference, prompt_system, caption_max_side, cache_tag
+                )
+                if caption is not None:
+                    cache_status = "Tile caption cache REUSED | saved prompt of an edited copy of this picture"
 
         if caption is None:
             if clip is None:
@@ -1854,7 +2042,17 @@ class SmartCachedTilePromptGenerator:
                     "The sampler was not given an unsafe prompt."
                 )
             if cache_mode != "bypass":
-                _, write_error = _write_prompt(cache_key, caption, cache_tag)
+                # A conservative fallback is a guess, not a reading of the tile.
+                # Saving it would serve the guess on every later run, so the key
+                # stays empty and the next run asks the model again.
+                write_error = ""
+                if not conservative_fallback_guarded:
+                    _, write_error = _write_prompt(cache_key, caption, cache_tag)
+                    _write_reusable(
+                        self._reuse_slot(tile_reference, prompt_system, caption_max_side, cache_tag),
+                        image,
+                        caption,
+                    )
                 guard_labels = []
                 if schema_guarded:
                     guard_labels.append("SCHEMA")
@@ -1865,7 +2063,8 @@ class SmartCachedTilePromptGenerator:
                 if false_detection_guarded:
                     guard_labels.append("FALSE-DETECTION")
                 if guard_labels:
-                    action = f"RETRY {' + '.join(guard_labels)}-GUARD WRITE"
+                    saved = "NOT SAVED" if conservative_fallback_guarded else "WRITE"
+                    action = f"RETRY {' + '.join(guard_labels)}-GUARD {saved}"
                 else:
                     action = "RETRY WRITE" if retried else "WRITE"
                 if write_error:

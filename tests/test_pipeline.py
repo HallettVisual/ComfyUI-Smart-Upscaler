@@ -424,7 +424,8 @@ EXACT-TILE PASS: Use only exact-tile evidence and spatially matching master cont
             "the exact tile supplies all content vocabulary", local_only
         )
         self.assertIn("historic European city", scene_aware)
-        self.assertIn("London, England", scene_aware)
+        # The place name reaches a tile only when names are asked for.
+        self.assertNotIn("London, England", scene_aware)
         self.assertIn("London, England", recognized)
         self.assertIn("A verified name may be used only when", recognized)
         self.assertNotIn("invented dramatic glow", recognized)
@@ -1374,7 +1375,7 @@ EXACT-TILE PASS: Use only exact-tile evidence and spatially matching master cont
             user_request="Convert the scene to realistic night.",
         )
         # Extra descriptive keys a chatty model might add must never reach a tile;
-        # only scene_type, geographic_context, and view are passed through.
+        # only scene_type and view are passed through by default.
         global_context = json.dumps(
             {
                 "scene_type": "waterfront city",
@@ -1399,7 +1400,7 @@ EXACT-TILE PASS: Use only exact-tile evidence and spatially matching master cont
         instruction = instructions[0].lower()
 
         self.assertIn("convert the scene to realistic night", instruction)
-        self.assertIn("toronto, canada", instruction)
+        self.assertNotIn("toronto", instruction)
         self.assertNotIn("dark sky", instruction)
         self.assertNotIn("ocean", instruction)
         self.assertNotIn("marina", instruction)
@@ -1693,7 +1694,8 @@ EXACT-TILE PASS: Use only exact-tile evidence and spatially matching master cont
             with patch("nodes.cache._cache_root", return_value=Path(cache_directory)):
                 self.assertEqual(node.check_lazy_status(None, *arguments), ["clip"])
                 first = node.generate(model, *arguments)
-                self.assertFalse(model.tokenize_args[1]["thinking"])
+                # thinking=True is the plain chat template: no empty think block.
+                self.assertTrue(model.tokenize_args[1]["thinking"])
                 self.assertFalse(model.tokenize_args[1]["skip_template"])
                 self.assertFalse(model.generate_args["do_sample"])
                 self.assertIn("white brick with narrow joints", first[0])

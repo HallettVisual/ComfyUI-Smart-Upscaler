@@ -70,9 +70,24 @@ def _channel_stats(image):
     return mean, std
 
 
+# Coarse enough that an edge the model moved by a few pixels never picks up a
+# halo, fine enough to fix colour that drifts inside one tile.
+_ORIGINAL_COLORS_LONG_SIDE = 32
+
+
 def _color_match(image, source, method):
     if method == "none":
         return image
+    if method == "original_colors":
+        # The source's broad colour at every pixel with the model's detail on
+        # top. Every tile is pulled to the same reference, so neighbours agree
+        # at the join - unlike the whole-tile averages below, which give each
+        # tile its own shift and can print the tile grid.
+        return (
+            image
+            + _low_frequency(source, _ORIGINAL_COLORS_LONG_SIDE)
+            - _low_frequency(image, _ORIGINAL_COLORS_LONG_SIDE)
+        )
     if method == "local_tone":
         # Match the source's brightness region by region (low frequency only),
         # fixing local tone drift while preserving generated color and detail.
@@ -113,15 +128,33 @@ def _prepare_source(generated_tile, source_tile):
     return source
 
 
+COLOR_MATCH_METHODS = (
+    "none",
+    "luminance",
+    "local_tone",
+    "rgb_mean",
+    "rgb_mean_std",
+    "original_colors",
+    "automatic",
+)
+
 # Quick-correction presets: each maps to exact dial values. "Manual" leaves the
-# dials in charge, so existing workflows behave identically.
+# dials in charge, so existing workflows behave identically. Presets that left
+# this list stay accepted in saved graphs (VALIDATE_INPUTS); their dial values
+# still run exactly as before.
 COLOR_MATCH_PRESETS = {
-    "Manual (use dials below)": None,
+    "Automatic - original colors unless the task changes the look (recommended)": ("automatic", 100),
+    "Original colors, no tile seams": ("original_colors", 100),
     "No color change (style/lighting edits)": ("none", 0),
-    "Match source brightness (recommended)": ("luminance", 50),
-    "Even out local brightness": ("local_tone", 60),
-    "Match source colors fully": ("rgb_mean_std", 60),
+    "Manual (use dials below)": None,
 }
+
+
+def _automatic_method(prompt_system):
+    """Original colours, except when the Prompt Director's task changes the look."""
+    if isinstance(prompt_system, dict) and prompt_system.get("operation_mode") == "style_transform":
+        return "none"
+    return "original_colors"
 
 
 class SmartTileColorMatch:
@@ -137,18 +170,18 @@ class SmartTileColorMatch:
                 "generated_tile": ("IMAGE",),
                 "source_tile": ("IMAGE",),
                 "color_match_method": (
-                    ["none", "luminance", "local_tone", "rgb_mean", "rgb_mean_std"],
+                    list(COLOR_MATCH_METHODS),
                     {
-                        "default": "luminance",
+                        "default": "automatic",
                         "advanced": True,
                         "label": "Match Colors to the Original",
-                        "tooltip": "Set by the Quick Preset. none: keep generated colors. luminance: match the original's overall brightness (safest). local_tone: even out brightness region by region, keeping generated color and detail. rgb_mean: match average color. rgb_mean_std: match color and contrast fully.",
+                        "tooltip": "Set by the Quick Preset. automatic: original_colors, or none when the Prompt Director's task changes the look (style, time of day). original_colors: the original's broad color at every pixel with the model's detail on top - neighbouring tiles agree, so no tile grid. none: keep generated colors. The older methods (luminance, local_tone, rgb_mean, rgb_mean_std) match each tile as a whole and can leave tiles slightly different shades.",
                     },
                 ),
                 "color_match_strength": (
                     "INT",
                     {
-                        "default": 50,
+                        "default": 100,
                         "min": 0,
                         "max": 100,
                         "step": 1,
@@ -162,13 +195,20 @@ class SmartTileColorMatch:
                 "color_preset": (
                     list(COLOR_MATCH_PRESETS),
                     {
-                        "default": "Match source brightness (recommended)",
+                        "default": "Automatic - original colors unless the task changes the look (recommended)",
                         "label": "Quick Preset",
-                        "tooltip": "The only setting most pictures need. It fills in the two dials in Advanced and stays shown as a label. Pick No color change for day-to-night or style edits, Match source brightness for faithful photo upscales.",
+                        "tooltip": "The only setting most pictures need. It fills in the two dials in Advanced and stays shown as a label.\n\nAutomatic keeps the original picture's colors so every tile matches its neighbours, and changes nothing when the Prompt Director's task is a style or time-of-day change. Connect the Prompt Director's prompt_system for that; without it, Automatic always keeps the original colors.",
                     },
                 ),
+                "prompt_system": ("SMART_PROMPT_SYSTEM", {"forceInput": True}),
             },
         }
+
+    @classmethod
+    def VALIDATE_INPUTS(cls, color_preset=None):
+        # Graphs saved with a preset that has since left the list still queue;
+        # the preset is only a label, the dials decide.
+        return True
 
     def apply(
         self,
@@ -177,10 +217,13 @@ class SmartTileColorMatch:
         color_match_method,
         color_match_strength,
         color_preset="Manual (use dials below)",
+        prompt_system=None,
     ):
         # The preset dropdown writes values into the visible dials (see
         # web/finishing_presets.js) and stays selected as a label; the dials are
         # always the source of truth here.
+        if color_match_method == "automatic":
+            color_match_method = _automatic_method(prompt_system)
         source = _prepare_source(generated_tile, source_tile)
         strength = float(color_match_strength) / 100.0
         if color_match_method == "none" or strength <= 0.0:
