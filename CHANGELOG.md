@@ -1,6 +1,17 @@
 # Changelog
 
-## Unreleased — 2026-09-24
+## 1.3.0 — 2026-09-25
+
+**Fixes**
+
+- No more hard crash of ComfyUI while tile prompts are written. The prompt
+  nodes switch off ComfyUI's new CUDA graph decode for their own calls, so
+  `--disable-comfy-compiler` is no longer needed.
+- Loads on Python 3.10 and 3.11 again (#1).
+- Qwen Image 2.1 tiles, which come back with an alpha channel, are accepted
+  by Color Match, Stitch Tiles and the Tile Inspector (#2).
+- Tiles no longer receive the city name unless a preset asks for names, so
+  they stop painting landmarks they cannot see.
 
 **Faster prompting**
 
