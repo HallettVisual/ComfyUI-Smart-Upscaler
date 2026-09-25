@@ -9,7 +9,12 @@ import unittest
 
 import torch
 
-from nodes.fidelity import COLOR_MATCH_PRESETS, SmartTileColorMatch, _color_match
+from nodes.fidelity import (
+    COLOR_MATCH_METHODS,
+    COLOR_MATCH_PRESETS,
+    SmartTileColorMatch,
+    _color_match,
+)
 from nodes.finalize import (
     FINISH_PRESETS,
     SmartTileFinalizer,
@@ -48,13 +53,58 @@ class ColorMatchPresetTests(unittest.TestCase):
         self.assertTrue(torch.equal(with_preset, without_preset))
 
     def test_every_preset_maps_to_valid_dial_values(self):
-        methods = ["none", "luminance", "local_tone", "rgb_mean", "rgb_mean_std"]
+        methods = SmartTileColorMatch.INPUT_TYPES()["required"]["color_match_method"][0]
+        self.assertEqual(methods, list(COLOR_MATCH_METHODS))
         for name, mapping in COLOR_MATCH_PRESETS.items():
             if mapping is None:
                 continue
             method, strength = mapping
             self.assertIn(method, methods, name)
             self.assertTrue(0 <= strength <= 100, name)
+
+
+class OriginalColorsMethodTests(unittest.TestCase):
+    def _neighbours(self):
+        # One source strip cut into two tiles; the model tinted each tile
+        # differently, the classic checkerboard cast.
+        torch.manual_seed(4)
+        source = torch.rand(1, 64, 64, 3) * 0.2 + 0.4
+        detail = torch.rand(1, 64, 64, 3) * 0.1
+        left = (source + detail + torch.tensor([0.12, 0.0, -0.08])).clamp(0, 1)
+        right = (source + detail + torch.tensor([-0.10, 0.06, 0.05])).clamp(0, 1)
+        return source, left, right
+
+    def test_differently_tinted_tiles_come_back_the_same_color(self):
+        source, left, right = self._neighbours()
+        node = SmartTileColorMatch()
+        fixed_left = node.apply(left, source, "original_colors", 100)[0]
+        fixed_right = node.apply(right, source, "original_colors", 100)[0]
+        before = (left.mean(dim=(1, 2)) - right.mean(dim=(1, 2))).abs().max()
+        after = (fixed_left.mean(dim=(1, 2)) - fixed_right.mean(dim=(1, 2))).abs().max()
+        self.assertGreater(float(before), 0.1)
+        self.assertLess(float(after), 0.01)
+        # The model's fine detail survives: only broad color was replaced.
+        self.assertGreater(float((fixed_left - source).std()), 0.02)
+
+    def test_automatic_leaves_a_look_change_alone(self):
+        source, left, _ = self._neighbours()
+        node = SmartTileColorMatch()
+        restyled = node.apply(
+            left, source, "automatic", 100, prompt_system={"operation_mode": "style_transform"}
+        )[0]
+        self.assertTrue(torch.equal(restyled, left.clamp(0, 1)))
+        faithful = node.apply(
+            left, source, "automatic", 100, prompt_system={"operation_mode": "detail_enhance"}
+        )[0]
+        expected = node.apply(left, source, "original_colors", 100)[0]
+        self.assertTrue(torch.equal(faithful, expected))
+        # Not wired to the Prompt Director: keep the original colors.
+        self.assertTrue(torch.equal(node.apply(left, source, "automatic", 100)[0], expected))
+
+    def test_a_retired_preset_name_in_a_saved_graph_still_queues(self):
+        self.assertTrue(
+            SmartTileColorMatch.VALIDATE_INPUTS(color_preset="Match source brightness (recommended)")
+        )
 
 
 class LocalToneMethodTests(unittest.TestCase):
@@ -247,7 +297,10 @@ class PresetFirstDefaultTests(unittest.TestCase):
     def test_color_match_defaults_match_its_shipped_preset(self):
         defaults = self._defaults(SmartTileColorMatch)
         shipped = defaults["color_preset"]["default"]
-        self.assertEqual(shipped, "Match source brightness (recommended)")
+        self.assertEqual(
+            shipped,
+            "Automatic - original colors unless the task changes the look (recommended)",
+        )
         method, strength = COLOR_MATCH_PRESETS[shipped]
         self.assertEqual(defaults["color_match_method"]["default"], method)
         self.assertEqual(defaults["color_match_strength"]["default"], strength)

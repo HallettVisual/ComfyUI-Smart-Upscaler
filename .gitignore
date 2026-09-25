@@ -50,3 +50,6 @@ scripts/
 
 # Downloaded copies of the README. Only README.md ships.
 README(*).md
+
+# Local safety copies made before a review session.
+backups/

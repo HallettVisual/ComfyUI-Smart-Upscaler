@@ -513,6 +513,29 @@ class MainSubjectTrackingTests(unittest.TestCase):
         # Whole-image location labels still never leak into candidates.
         self.assertNotIn("matching_locations", top_left[0])
 
+    def test_a_small_object_placed_elsewhere_is_not_offered(self):
+        # Tiles copy what they are shown: a harbor the brief puts in the middle
+        # row reached the prompt of a sky-and-hills tile above it.
+        from nodes.universal_prompting import _object_map_context
+
+        global_context = {
+            "object_map": [
+                {
+                    "id": "harbor",
+                    "locations": ["middle left", "center", "middle right"],
+                    "identity": "harbor",
+                    "target_prompt": "harbor with docked boats and concrete piers",
+                }
+            ]
+        }
+        metadata = {"image_width": 100, "image_height": 100}
+        top_band = {"x": 0, "y": 0, "width": 100, "height": 30}
+        middle_band = {"x": 0, "y": 40, "width": 100, "height": 20}
+        self.assertEqual(_object_map_context(global_context, top_band, metadata), [])
+        self.assertEqual(
+            _object_map_context(global_context, middle_band, metadata)[0]["id"], "harbor"
+        )
+
     def test_a_declared_surface_is_never_offered_as_an_object_part(self):
         # Toronto waterfront read, 2026-07-30. The whole-image pass gave the
         # picture-spanning skyline every region, then filled the water regions
@@ -2003,6 +2026,7 @@ class UserDialAndPresetPackTests(unittest.TestCase):
                 "tile_detail",
                 "sampler_prompt_style",
                 "tile_colors",
+                "prompt_reuse",
             ],
         )
         # A workflow saved before the control existed calls build without it.
@@ -2011,6 +2035,12 @@ class UserDialAndPresetPackTests(unittest.TestCase):
             user_request="",
             known_false_detections="",
         )
+        self.assertFalse(prompt_system["prompt_reuse"])
+        # Older graphs hand the reuse slot the Save button's null: still Off.
+        _, prompt_system_null, _ = SmartUnifiedPromptGuidance().build(
+            instructions="TASK: Upscale / Detailer", prompt_reuse=None
+        )
+        self.assertFalse(prompt_system_null["prompt_reuse"])
         self.assertEqual(
             prompt_system["caption_detail"], "Adaptive by Tile (recommended)"
         )

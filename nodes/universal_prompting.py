@@ -253,6 +253,19 @@ _TILE_COLOR_LEGACY_OFF = "automatic (follow the preset instructions)"
 _TILE_COLOR_LEGACY_ON = "no color words (keep original colors)"
 
 
+# Reuse is for an edited copy of the SAME picture at the same size: the saved
+# prompts are used again instead of reading the picture fresh. Anything
+# unrecognised - including the empty slot an older saved graph carries - is Off.
+PROMPT_REUSE_CHOICES = (
+    "Off - read the picture fresh (default)",
+    "On - reuse saved prompts for an edited copy of the same picture",
+)
+
+
+def _prompt_reuse_on(value):
+    return " ".join(str(value or "").split()).casefold().startswith("on")
+
+
 def _color_words_mode(value):
     """Map the Color Words control to `keep` or `strip`, defaulting to keep.
 
@@ -842,15 +855,21 @@ def _declared_surface_labels(global_context):
     return labels
 
 
+# Fraction of the frame an object's stated areas must cover before it is still
+# offered to a tile its locations miss. The camel that missed one quadrant
+# claimed about half the frame; a harbor, car or pool placed elsewhere does not.
+_UNDER_LOCATED_SUBJECT_AREA = 0.4
+
+
 def _object_map_context(global_context, tile, metadata, excluded_terms=(), limit=2, field="object_map"):
     """Return canonical object candidates for this tile, with a per-tile part hint.
 
-    Every object candidate is offered as a HYPOTHESIS to any tile that can hold
-    discrete content — the tile must still confirm it from its own pixels before
-    the resolver reuses the canonical phrase, so nothing here draws an object.
-    Stated locations rank the candidates and pick the tile's `part_in_this_tile`
-    hint, but they no longer gate the offer: a main subject whose location list
-    missed one area (the camel's hump) must still be confirmable there.
+    Each candidate is a HYPOTHESIS — the tile must still confirm it from its own
+    pixels before the resolver reuses the canonical phrase. Stated locations rank
+    the candidates and pick the tile's `part_in_this_tile` hint. A candidate the
+    brief places entirely elsewhere is offered only when it is a large subject
+    (a main subject whose location list missed one area, the camel's hump);
+    smaller objects placed elsewhere are withheld, because tiles copy them.
     """
     if not isinstance(global_context, dict):
         return []
@@ -894,6 +913,19 @@ def _object_map_context(global_context, tile, metadata, excluded_terms=(), limit
             for horizontal, vertical in matched_cells
             if horizontal and vertical
         )
+        if spatial_overlap <= 0.0:
+            # A hint the brief places elsewhere reached the final prompt for a
+            # third of logged candidates - mostly copied, not seen. Only a subject
+            # filling much of the frame can plausibly have been under-located.
+            claimed_area = sum(
+                _coarse_cell_overlap((0.0, 0.0, 1.0, 1.0), horizontal, vertical)
+                for horizontal, vertical in {
+                    _coarse_location_axes(location) for location in cleaned["locations"]
+                }
+                if horizontal and vertical
+            )
+            if claimed_area < _UNDER_LOCATED_SUBJECT_AREA:
+                continue
         part_hints = []
         for label, text in parts.items():
             if location_axes(label) not in tile_pairs:
@@ -1086,7 +1118,10 @@ def _compact_global_context(
     if awareness != "Local Evidence Only":
         if evidence_class == "uniform":
             keys = ("view",)
-        elif evidence_class == "sparse":
+        elif evidence_class == "sparse" or awareness != "Recognized Names When Visible":
+            # A place name lets the tile recall landmarks instead of reading its
+            # pixels: a London centre tile listed the London Eye "in the
+            # distance" and Klein painted a miniature London into it.
             keys = ("scene_type", "view")
         else:
             keys = ("scene_type", "geographic_context", "view")
@@ -1683,6 +1718,7 @@ class SmartPromptGuidance:
         prompt_suffix="",
         unified_instruction_ui=False,
         tile_colors=TILE_COLOR_CHOICES[0],
+        prompt_reuse=PROMPT_REUSE_CHOICES[0],
     ):
         preset_name = str(task_preset)
         preset = TASK_PRESETS.get(preset_name, TASK_PRESETS["Google Image Enhance"])
@@ -1794,6 +1830,7 @@ Return compact JSON with exactly these keys: scene_type, geographic_context, vie
             ),
             "prompt_suffix": str(prompt_suffix).strip(),
             "color_words": _color_words_mode(tile_colors),
+            "prompt_reuse": _prompt_reuse_on(prompt_reuse),
             "unified_instruction_ui": bool(unified_instruction_ui),
         }
         if bool(unified_instruction_ui):
@@ -1893,12 +1930,21 @@ class SmartUnifiedPromptGuidance:
                         "tooltip": "Leave this Off - Off changes nothing at all. Turn it On only for the one problem it fixes: a model painting whole tiles a flat shade (the checkerboard tint), which happens when tile prompts name colors. On deletes color names from the finished tile prompt. Colors you typed into Your Request are always kept.",
                     },
                 ),
+                "prompt_reuse": (
+                    list(PROMPT_REUSE_CHOICES),
+                    {
+                        "default": PROMPT_REUSE_CHOICES[0],
+                        "label": "7. Reuse saved prompts (edited copy, same size)",
+                        "tooltip": "Turn On after you retouch or re-save a picture you already ran: same picture, same size, small changes. The saved scene summary and tile prompts are used again instead of reading the picture fresh, so prompting takes seconds. A tile you changed a lot is still read fresh, and a different photo is never matched. Turn it Off for a new picture.",
+                    },
+                ),
             },
         }
 
     @classmethod
     def VALIDATE_INPUTS(
-        cls, tile_detail=None, sampler_prompt_style=None, tile_colors=None
+        cls, tile_detail=None, sampler_prompt_style=None, tile_colors=None,
+        prompt_reuse=None,
     ):
         # Accept any stored values so graphs saved with older control layouts
         # still queue; build() maps unknown values to safe defaults.
@@ -1913,6 +1959,7 @@ class SmartUnifiedPromptGuidance:
         sampler_prompt_style="Instruction edit (Klein, Qwen Edit)",
         prompt_suffix="Fine detail",
         tile_colors=TILE_COLOR_CHOICES[0],
+        prompt_reuse=PROMPT_REUSE_CHOICES[0],
     ):
         # Graphs saved before the suffix box moved above the dropdowns carry
         # their optional widget values one slot late (values apply by position).
@@ -1947,6 +1994,7 @@ class SmartUnifiedPromptGuidance:
             prompt_suffix=prompt_suffix,
             unified_instruction_ui=True,
             tile_colors=tile_colors,
+            prompt_reuse=prompt_reuse,
         )
 
 

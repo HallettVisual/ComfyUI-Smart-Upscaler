@@ -1,5 +1,39 @@
 # Changelog
 
+## Unreleased — 2026-09-24
+
+**Faster prompting**
+
+- The vision model no longer gets an empty "thinking" block appended to its
+  prompt. Qwen3-VL Instruct was not trained on it: some tiles looped to the
+  token limit (about 60 s each), failed, were asked again and fell back to a
+  guessed prompt. Tiles now take 11-23 s and stop on their own.
+- A guessed fallback prompt is no longer saved to the cache, so the next run
+  asks again instead of reusing the guess.
+
+**Reuse saved prompts**
+
+- New Prompt Director setting *7. Reuse saved prompts (edited copy, same
+  size)*. Off by default. On, a retouched copy of a picture already run reuses
+  its scene summary and tile prompts; tiles that changed a lot are read fresh,
+  and a different photo is never matched.
+
+**Color**
+
+- Color Match gains *original_colors* (the original's broad color at every
+  pixel, the model's detail on top) and *automatic* (original colors, or no
+  change when the task is Style Transfer or Time of Day - connect the Prompt
+  Director's `prompt_system`). Automatic is the new default. On real Klein 9B
+  tiles, neighbouring-tile color mismatch dropped from 5.2 to under 1 (0-255).
+- The preset list is down to Automatic / Original colors / No color change /
+  Manual. Saved graphs with a retired preset still load and run as before.
+
+**Fewer false positives**
+
+- A tile is no longer shown an object the scene summary places elsewhere,
+  unless that object covers at least 40% of the frame. In logged runs a third
+  of those hints were copied into the tile prompt.
+
 ## 1.2.0 — 2026-09-23
 
 **Fewer settings**

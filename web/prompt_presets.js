@@ -16,7 +16,8 @@ const DEFAULT_COLORS = "Off - change nothing (default)";
 // Plain-language labels. The widget ORDER is fixed - saved workflows apply
 // widget values by position, so nothing here may be reordered. Instead the
 // names carry the grouping: 1-3 describe the job, 4-5 shape every tile prompt,
-// and 6 is a rare repair that is a true bypass unless it is switched on.
+// 6 is a rare repair that is a true bypass unless it is switched on, and 7
+// reuses saved prompts for an edited copy of a picture already run.
 const WIDGET_LABELS = {
   instructions: "1. Instructions - what this job is",
   user_request: "2. Your request (optional)",
@@ -24,6 +25,7 @@ const WIDGET_LABELS = {
   prompt_suffix: "4. Tile prompts: extra words at the end",
   tile_detail: "5. Tile prompts: how much detail",
   tile_colors: "6. Repair: delete color names (rare)",
+  prompt_reuse: "7. Reuse saved prompts (edited copy, same size)",
 };
 // These bodies mirror UNIFIED_TASK_INSTRUCTIONS in nodes/universal_prompting.py.
 // Keep the two in sync so "Load Complete Preset" matches the node defaults.
@@ -187,6 +189,18 @@ app.registerExtension({
   name: "ComfyUI.SmartUpscaler.CompletePromptPresets",
   async beforeRegisterNodeDef(nodeType, nodeData) {
     if (nodeData.name !== "SmartUnifiedPromptGuidance") return;
+
+    const originalConfigure = nodeType.prototype.onConfigure;
+    nodeType.prototype.onConfigure = function () {
+      originalConfigure?.apply(this, arguments);
+      // Graphs saved before the reuse control existed hand it the Save
+      // button's empty slot; show the real default instead of a blank value.
+      const reuse = this.widgets?.find((widget) => widget.name === "prompt_reuse");
+      const choices = reuse?.options?.values;
+      if (reuse && Array.isArray(choices) && !choices.includes(reuse.value)) {
+        reuse.value = choices[0];
+      }
+    };
 
     const originalCreated = nodeType.prototype.onNodeCreated;
     nodeType.prototype.onNodeCreated = function () {

@@ -47,21 +47,17 @@ const FINISH_PRESETS = {
 };
 
 const COLOR_MATCH_PRESETS = {
+  "Automatic - original colors unless the task changes the look (recommended)": {
+    color_match_method: "automatic",
+    color_match_strength: 100,
+  },
+  "Original colors, no tile seams": {
+    color_match_method: "original_colors",
+    color_match_strength: 100,
+  },
   "No color change (style/lighting edits)": {
     color_match_method: "none",
     color_match_strength: 0,
-  },
-  "Match source brightness (recommended)": {
-    color_match_method: "luminance",
-    color_match_strength: 50,
-  },
-  "Even out local brightness": {
-    color_match_method: "local_tone",
-    color_match_strength: 60,
-  },
-  "Match source colors fully": {
-    color_match_method: "rgb_mean_std",
-    color_match_strength: 60,
   },
 };
 
