@@ -31,7 +31,7 @@ def _save_inspector_image(image, directory, prefix):
         raise ValueError("Each inspector image must contain exactly one ComfyUI image.")
     filename = f"{prefix}_{uuid.uuid4().hex[:12]}.png"
     image_array = (
-        image[0].detach().float().clamp(0.0, 1.0).cpu().numpy() * 255.0
+        image[0, ..., :3].detach().float().clamp(0.0, 1.0).cpu().numpy() * 255.0
     ).round().astype(np.uint8)
     Image.fromarray(image_array, mode="RGB").save(directory / filename, compress_level=1)
     return {

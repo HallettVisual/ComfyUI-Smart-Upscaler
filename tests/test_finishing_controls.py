@@ -165,6 +165,25 @@ class FinalizerPresetTests(unittest.TestCase):
         arguments.update(overrides)
         return SmartTileFinalizer().finalize(**arguments)
 
+    def test_rgba_tiles_from_qwen_image_21_are_accepted(self):
+        # Qwen Image 2.1's VAE decodes RGBA; the alpha of an opaque upscale is 1.
+        torch.manual_seed(3)
+        image = torch.rand(1, 8, 12, 3)
+        tiles = SmartTilePlanner().plan(
+            image, tile_width=6, tile_height=8, overlap=2, feather=1,
+            scale_factor=1.0, padding_mode="edge",
+        )[0]
+        rgba = [
+            torch.cat((tiles[index : index + 1] * 0.9, torch.ones(1, *tiles.shape[1:3], 1)), -1)
+            for index in range(tiles.shape[0])
+        ]
+        rgb_tiles, rgb_image = self._run()
+        rgba_tiles, rgba_image = self._run(processed_images=rgba)
+        self.assertTrue(torch.allclose(rgb_image, rgba_image, atol=1e-6))
+        self.assertEqual(rgba_tiles[0].shape[-1], 3)
+        matched = SmartTileColorMatch().apply(rgba[0], tiles[0:1], "original_colors", 100)[0]
+        self.assertEqual(matched.shape[-1], 3)
+
     def test_manual_preset_matches_previous_behavior(self):
         baseline_tiles, baseline_image = self._run()
         manual_tiles, manual_image = self._run(
