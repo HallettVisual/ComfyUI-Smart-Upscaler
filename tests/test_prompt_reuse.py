@@ -138,5 +138,34 @@ class PromptReuseTests(unittest.TestCase):
         self.assertIn("REUSED", reused[1])
 
 
+
+class PlainDecodeTests(unittest.TestCase):
+    def test_caption_generation_runs_without_cuda_graphs_and_restores_them(self):
+        from types import SimpleNamespace
+
+        args = SimpleNamespace(disable_comfy_compiler=False, disable_cuda_graphs=False)
+        seen = []
+
+        class WatchingModel(CountingModel):
+            def generate(self, tokens, **kwargs):
+                seen.append((args.disable_comfy_compiler, args.disable_cuda_graphs))
+                return super().generate(tokens, **kwargs)
+
+        with patch("nodes.cache._comfy_args", args):
+            SmartCachedTilePromptGenerator._run_caption(
+                WatchingModel(TILE_CAPTION), _picture(5), "Caption.", "Managed", 64
+            )
+            with self.assertRaises(RuntimeError):
+                class FailingModel(CountingModel):
+                    def generate(self, tokens, **kwargs):
+                        raise RuntimeError("out of memory")
+
+                SmartCachedTilePromptGenerator._run_caption(
+                    FailingModel(TILE_CAPTION), _picture(5), "Caption.", "Managed", 64
+                )
+        self.assertEqual(seen, [(True, True)])
+        self.assertEqual((args.disable_comfy_compiler, args.disable_cuda_graphs), (False, False))
+
+
 if __name__ == "__main__":
     unittest.main()
