@@ -1,3 +1,4 @@
+import contextlib
 import hashlib
 import json
 import os
@@ -11,6 +12,11 @@ import uuid
 import weakref
 
 import torch
+
+try:
+    from comfy.cli_args import args as _comfy_args
+except ImportError:  # the unit tests run without ComfyUI
+    _comfy_args = None
 
 # The vision model's identity inside every caption cache key. It was a widget
 # whose only job was cache namespacing, which cache_tag already does; the value
@@ -190,6 +196,27 @@ def _tile_context_fallback(reference):
 
 
 _EXPECTED_OBJECT_MIN_OVERLAP = 0.12
+
+
+@contextlib.contextmanager
+def _plain_decode():
+    """Generate captions without ComfyUI's recorded-allocation (CUDA graph) path.
+
+    Since ComfyUI's Qwen3 cudagraph decode (Sept 2026), cleaning up that recording
+    after the node hard-crashed ComfyUI for several users - fixed only by
+    launching with --disable-comfy-compiler. Caption decoding measured no faster
+    with it, so it is switched off for exactly these calls and restored after.
+    """
+    if _comfy_args is None:
+        yield
+        return
+    saved = (_comfy_args.disable_comfy_compiler, _comfy_args.disable_cuda_graphs)
+    _comfy_args.disable_comfy_compiler = True
+    _comfy_args.disable_cuda_graphs = True
+    try:
+        yield
+    finally:
+        _comfy_args.disable_comfy_compiler, _comfy_args.disable_cuda_graphs = saved
 
 
 def _is_conservative_fallback(caption):
@@ -1354,18 +1381,19 @@ class SmartCachedTextGenerate:
                 min_length=1,
                 thinking=_PLAIN_CHAT_TEMPLATE,
             )
-            generated_ids = clip.generate(
-                tokens,
-                do_sample=sampling_mode in ("on", "Varied wording"),
-                max_length=int(response_limit or max_length),
-                temperature=0.7,
-                top_k=64,
-                top_p=0.95,
-                min_p=0.05,
-                repetition_penalty=1.05,
-                presence_penalty=0.0,
-                seed=0,
-            )
+            with _plain_decode():
+                generated_ids = clip.generate(
+                    tokens,
+                    do_sample=sampling_mode in ("on", "Varied wording"),
+                    max_length=int(response_limit or max_length),
+                    temperature=0.7,
+                    top_k=64,
+                    top_p=0.95,
+                    min_p=0.05,
+                    repetition_penalty=1.05,
+                    presence_penalty=0.0,
+                    seed=0,
+                )
             return str(clip.decode(generated_ids))
 
         text = run_caption(prompt)
@@ -1708,18 +1736,19 @@ class SmartCachedTilePromptGenerator:
             min_length=1,
             thinking=_PLAIN_CHAT_TEMPLATE,
         )
-        generated_ids = clip.generate(
-            tokens,
-            do_sample=str(caption_generation) == "Varied wording",
-            max_length=max_length,
-            temperature=0.7,
-            top_k=64,
-            top_p=0.95,
-            min_p=0.05,
-            repetition_penalty=1.05,
-            presence_penalty=0.0,
-            seed=0,
-        )
+        with _plain_decode():
+            generated_ids = clip.generate(
+                tokens,
+                do_sample=str(caption_generation) == "Varied wording",
+                max_length=max_length,
+                temperature=0.7,
+                top_k=64,
+                top_p=0.95,
+                min_p=0.05,
+                repetition_penalty=1.05,
+                presence_penalty=0.0,
+                seed=0,
+            )
         return str(clip.decode(generated_ids))
 
     def check_lazy_status(
