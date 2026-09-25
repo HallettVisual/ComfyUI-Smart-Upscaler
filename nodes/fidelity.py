@@ -1,6 +1,8 @@
 import torch
 import torch.nn.functional as F
 
+from .processing import _rgb
+
 
 _STRUCTURE_LONG_SIDE = {
     "conservative": 64,
@@ -224,6 +226,7 @@ class SmartTileColorMatch:
         # always the source of truth here.
         if color_match_method == "automatic":
             color_match_method = _automatic_method(prompt_system)
+        generated_tile = _rgb(generated_tile)
         source = _prepare_source(generated_tile, source_tile)
         strength = float(color_match_strength) / 100.0
         if color_match_method == "none" or strength <= 0.0:
@@ -277,6 +280,7 @@ class SmartTileFidelityColorMatch:
         color_match_strength,
         reference_mode="appearance_and_structure",
     ):
+        generated_tile = _rgb(generated_tile)
         source = _prepare_source(generated_tile, source_tile)
 
         output = generated_tile

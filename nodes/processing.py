@@ -27,6 +27,17 @@ def _flatten_image_values(values):
     return flattened
 
 
+def _rgb(image):
+    """Drop an alpha channel from a generated tile (Qwen Image 2.1 decodes RGBA).
+
+    An upscaled opaque source has alpha ~1 everywhere, so the colour channels
+    are the picture; compositing would only darken it.
+    """
+    if isinstance(image, torch.Tensor) and image.ndim == 4 and image.shape[-1] > 3:
+        return image[..., :3]
+    return image
+
+
 def _tile_image_list(values):
     """Normalize either a Comfy IMAGE batch or a list of one-image batches."""
     tiles = []
@@ -267,6 +278,7 @@ class SmartTileMergePartialBatch:
 
         seen_indexes = set()
         for processed_image, reference_json in zip(processed, references):
+            processed_image = _rgb(processed_image)
             try:
                 reference = json.loads(reference_json)
             except (TypeError, json.JSONDecodeError) as exc:

@@ -495,6 +495,11 @@ class SmartUpscaledTilePlanner:
         tile_mebibytes = (
             upscaled_tiles.numel() * upscaled_tiles.element_size() / (1024.0 * 1024.0)
         )
+        native_scale = (
+            f" | model native {float(getattr(upscale_model, 'scale', 1.0)):g}x"
+            if str(upscale_method) == UPSCALE_METHODS[0]
+            else ""
+        )
         preflight_summary = (
             f"Output: {int(metadata['output_width'])} x {int(metadata['output_height'])}\n"
             f"Grid: {int(metadata['grid_columns'])} columns x {int(metadata['grid_rows'])} rows "
@@ -502,7 +507,7 @@ class SmartUpscaledTilePlanner:
             f"Sampler tiles: {target_width} x {target_height} | divisible by {tile_alignment}\n"
             f"Overlap: {int(overlap)} px | Feather: {int(feather)} px\n"
             f"Scale: {float(scale_factor):g}x | Enlargement: {str(upscale_method)}"
-            f"{f' | model native {float(getattr(upscale_model, 'scale', 1.0)):g}x' if str(upscale_method) == UPSCALE_METHODS[0] else ''}\n"
+            f"{native_scale}\n"
             f"Persistent preprocessing cache: {cache_status}"
             f"{f' | {cache_key[:12]}' if cache_key else ''}\n"
             f"Active upscale batch: {int(upscale_batch_size)} tile(s) (lower this first if VRAM is tight)\n"
