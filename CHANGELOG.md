@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+**Live prompt readout**
+
+- The Prompt log node now fills in while tile prompts are being written: each
+  tile's number, position, finished prompt and cache status appear the moment
+  that tile is done. The complete log replaces it when the run finishes.
+
 **New: Stitch Tiles - Clean (on trial)**
 
 - A simpler stitcher beside the old one, which stays unchanged. Two dropdowns:

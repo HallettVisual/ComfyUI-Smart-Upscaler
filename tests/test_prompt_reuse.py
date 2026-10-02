@@ -42,7 +42,7 @@ def _picture(seed):
     return torch.rand((1, 48, 64, 3), generator=generator)
 
 
-class PromptReuseTests(unittest.TestCase):
+class TileArguments:
     def _tile_arguments(self, image, reuse, source_rect=(0, 0, 64, 48)):
         _, system, _ = SmartPromptGuidance().build(
             task_preset="Upscale / Detailer",
@@ -70,6 +70,8 @@ class PromptReuseTests(unittest.TestCase):
             "artifacts, seams",
         )
 
+
+class PromptReuseTests(TileArguments, unittest.TestCase):
     def test_an_edited_copy_reuses_tile_prompts_without_the_model(self):
         original = _picture(1)
         edited = original.clone()
@@ -168,7 +170,7 @@ class PlainDecodeTests(unittest.TestCase):
 
 
 
-class TilePromptEditTests(PromptReuseTests):
+class TilePromptEditTests(TileArguments, unittest.TestCase):
     def test_parsing_tolerates_continued_lines_and_case(self):
         from nodes.cache import _tile_prompt_edits
 
@@ -204,6 +206,35 @@ class TilePromptEditTests(PromptReuseTests):
                 written = node.generate(model, *off, 0, edits)
                 self.assertIn("red tiled roofs", written[0].lower())
         self.assertEqual(model.calls, 1)
+
+
+
+class LiveReadoutTests(TileArguments, unittest.TestCase):
+    def test_each_tile_prompt_is_sent_to_the_screen_as_it_is_written(self):
+        from types import SimpleNamespace
+
+        sent = []
+        server = SimpleNamespace(
+            client_id="browser-1",
+            send_sync=lambda event, data, sid: sent.append((event, data, sid)),
+        )
+        node = SmartCachedTilePromptGenerator()
+        arguments = self._tile_arguments(_picture(8), True)
+        with tempfile.TemporaryDirectory() as cache_directory:
+            with patch("nodes.cache._cache_root", return_value=Path(cache_directory)), patch(
+                "nodes.cache.PromptServer", SimpleNamespace(instance=server)
+            ):
+                result = node.generate(None, *arguments, 0, "T001: a hand-written prompt")
+                # No browser attached (an API run): nothing is sent.
+                server.client_id = None
+                node.generate(None, *arguments, 0, "T001: a hand-written prompt")
+        self.assertEqual(len(sent), 1)
+        event, data, sid = sent[0]
+        self.assertEqual(event, "smart_upscaler.tile_prompt")
+        self.assertEqual(sid, "browser-1")
+        self.assertEqual(data["tile_id"], "T001")
+        self.assertEqual(data["prompt"], result[0])
+        self.assertIn("EDITED BY YOU", data["status"])
 
 
 if __name__ == "__main__":

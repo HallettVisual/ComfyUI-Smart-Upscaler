@@ -1,4 +1,37 @@
 import { app } from "../../scripts/app.js";
+import { api } from "../../scripts/api.js";
+
+// Live readout: the per-tile prompt node sends each tile's finished prompt as
+// soon as it is written (TILE_PROMPT_EVENT in nodes/cache.py). The complete
+// log replaces this text when the Prompt log node itself runs at the end.
+const TILE_PROMPT_EVENT = "smart_upscaler.tile_prompt";
+let liveTiles = 0;
+
+function auditViews() {
+  return (app.graph?._nodes || [])
+    .map((node) => node.smartPromptAudit)
+    .filter(Boolean);
+}
+
+api.addEventListener("execution_start", () => {
+  liveTiles = 0;
+});
+
+api.addEventListener(TILE_PROMPT_EVENT, ({ detail }) => {
+  liveTiles += 1;
+  const entry = `${detail.tile_id} | ${detail.position}\n${detail.prompt}\n[${detail.status}]\n\n`;
+  for (const view of auditViews()) {
+    if (liveTiles === 1) {
+      view.report.textContent =
+        "LIVE - each tile's prompt appears here as it is written.\n" +
+        "The complete log replaces this when the run finishes.\n\n";
+    }
+    view.report.textContent += entry;
+    view.report.scrollTop = view.report.scrollHeight;
+    view.status.textContent = `Writing tile prompts... ${liveTiles} done (latest ${detail.tile_id})`;
+  }
+  app.graph?.setDirtyCanvas(true, true);
+});
 
 app.registerExtension({
   name: "ComfyUI.SmartUpscaler.PromptAuditViewer",
