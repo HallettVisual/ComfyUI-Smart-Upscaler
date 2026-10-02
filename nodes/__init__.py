@@ -4,6 +4,7 @@ from .fidelity import SmartTileColorMatch
 from .finalize import SmartTileFinalizer
 from .processing import SmartSamplerTileSelector
 from .review import SmartTileInspector
+from .stitch import SmartTileStitchClean
 from .switching import SmartModelEngineSwitch
 from .universal_prompting import SmartUnifiedPromptGuidance, SmartTileJobDirector
 from .upscaled_tiling import SmartUpscaledTilePlanner
@@ -22,6 +23,7 @@ NODE_CLASS_MAPPINGS = {
     "SmartSamplerTileSelector": SmartSamplerTileSelector,
     "SmartTileColorMatch": SmartTileColorMatch,
     "SmartTileFinalizer": SmartTileFinalizer,
+    "SmartTileStitchClean": SmartTileStitchClean,
     "SmartTileInspector": SmartTileInspector,
     "SmartTilePromptAuditLog": SmartTilePromptAuditLog,
     "SmartModelEngineSwitch": SmartModelEngineSwitch,
@@ -36,6 +38,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "SmartSamplerTileSelector": "Sampler Tile Test Selector (Optional)",
     "SmartTileColorMatch": "Color Match to Original (Optional)",
     "SmartTileFinalizer": "Stitch Tiles Into One Picture",
+    "SmartTileStitchClean": "Stitch Tiles - Clean (test)",
     "SmartTileInspector": "Smart Tile Prompt Inspector",
     "SmartTilePromptAuditLog": "All Prompts Viewer + Log",
     "SmartModelEngineSwitch": "Generator Switch (only selected runs)",

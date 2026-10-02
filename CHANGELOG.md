@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+**New: Stitch Tiles - Clean (on trial)**
+
+- A simpler stitcher beside the old one, which stays unchanged. Two dropdowns:
+  *colors* (Automatic / Match the original / Keep the new look, even out the
+  tiles / Leave as drawn) and *joins* (Soft / Hard cut - stitch only, no
+  blending).
+- It never mixes the original's fine detail into the tiles, so it cannot add
+  the speckled look. On real Klein content: fine-texture change 0.11 vs 0.50-1.33
+  for the old node, neighbour colour mismatch 0.08 vs 0.39-0.65 (0-255).
+- Same inputs and outputs as Stitch Tiles Into One Picture, so it swaps in.
+
 **Edit any tile's prompt**
 
 - The Tile Inspector's prompt box is now editable. Change a tile's prompt and
