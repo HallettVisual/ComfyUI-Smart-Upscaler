@@ -18,6 +18,15 @@ try:
 except ImportError:  # the unit tests run without ComfyUI
     _comfy_args = None
 
+try:
+    from server import PromptServer
+except ImportError:  # the unit tests run without ComfyUI's server
+    PromptServer = None
+
+# Live readout: the Prompt log node shows each tile's prompt the moment it is
+# written (web/prompt_audit_viewer.js listens for this event).
+TILE_PROMPT_EVENT = "smart_upscaler.tile_prompt"
+
 # The vision model's identity inside every caption cache key. It was a widget
 # whose only job was cache namespacing, which cache_tag already does; the value
 # stays here so caches written before it was removed keep matching.
@@ -234,6 +243,25 @@ def _tile_prompt_edits(text):
         elif current and line.strip():
             edits[current] = f"{edits[current]} {line.strip()}".strip()
     return {tile_id: prompt for tile_id, prompt in edits.items() if prompt}
+
+
+def _announce_tile_prompt(tile_reference, positive, status):
+    if PromptServer is None or PromptServer.instance.client_id is None:
+        return
+    try:
+        reference = json.loads(str(tile_reference))
+    except json.JSONDecodeError:
+        reference = {}
+    PromptServer.instance.send_sync(
+        TILE_PROMPT_EVENT,
+        {
+            "tile_id": str(reference.get("tile_id", "")),
+            "position": str(reference.get("position", "")),
+            "prompt": str(positive),
+            "status": str(status),
+        },
+        PromptServer.instance.client_id,
+    )
 
 
 def _is_conservative_fallback(caption):
@@ -1853,6 +1881,27 @@ class SmartCachedTilePromptGenerator:
         negative_prompt_fallback,
         caption_max_side=1344,
         tile_prompt_edits="",
+    ):
+        result = self._write_tile_prompt(
+            clip, image, instruction, tile_reference, prompt_system, caption_generation,
+            cache_mode, cache_tag, negative_prompt_fallback, caption_max_side, tile_prompt_edits,
+        )
+        _announce_tile_prompt(tile_reference, result[0], result[4])
+        return result
+
+    def _write_tile_prompt(
+        self,
+        clip,
+        image,
+        instruction,
+        tile_reference,
+        prompt_system,
+        caption_generation,
+        cache_mode,
+        cache_tag,
+        negative_prompt_fallback,
+        caption_max_side,
+        tile_prompt_edits,
     ):
         _require_single_image(image, "Tile captioning")
         edit = self._user_edit(tile_reference, prompt_system, tile_prompt_edits)
