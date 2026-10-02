@@ -219,6 +219,23 @@ def _plain_decode():
         _comfy_args.disable_comfy_compiler, _comfy_args.disable_cuda_graphs = saved
 
 
+_TILE_EDIT_LINE = re.compile(r"^\s*(T\d+)\s*:\s*(.*)$", re.IGNORECASE)
+
+
+def _tile_prompt_edits(text):
+    """Parse "T006: prompt" lines; a line without a tile id continues the one above."""
+    edits = {}
+    current = None
+    for line in str(text or "").splitlines():
+        match = _TILE_EDIT_LINE.match(line)
+        if match:
+            current = match.group(1).upper()
+            edits[current] = match.group(2).strip()
+        elif current and line.strip():
+            edits[current] = f"{edits[current]} {line.strip()}".strip()
+    return {tile_id: prompt for tile_id, prompt in edits.items() if prompt}
+
+
 def _is_conservative_fallback(caption):
     """True for a guessed tile prompt that older versions saved to the cache."""
     try:
@@ -1566,6 +1583,15 @@ class SmartCachedTilePromptGenerator:
                         "tooltip": "Longest side of each real (unpadded) tile sent to the vision model. 1344 is the balanced 16 GB default; 0 sends the full tile, while 768-1024 saves more VRAM with a small fine-detail cost.",
                     },
                 ),
+                "tile_prompt_edits": (
+                    "STRING",
+                    {
+                        "default": "",
+                        "multiline": True,
+                        "label": "Your tile prompt edits (used while Reuse is On)",
+                        "tooltip": "One line per tile: T006: the exact prompt you want. Easiest from the Tile Inspector - edit a tile's prompt there and press 'Use my edit next run'. An edited tile skips the vision model and its prompt is used exactly as written. Edits are only used while the Prompt Director's '7. Reuse saved prompts' is On, so they never land on a different picture. Delete a line to go back to the model's prompt.",
+                    },
+                ),
             },
         }
 
@@ -1654,6 +1680,17 @@ class SmartCachedTilePromptGenerator:
             lambda text: _is_conservative_fallback(text)
             or self._caption_problem(text, tile_reference, prompt_system),
         )
+
+    @staticmethod
+    def _user_edit(tile_reference, prompt_system, tile_prompt_edits):
+        # Edits belong to one picture, and Reuse is the switch that says "same picture".
+        if not isinstance(prompt_system, dict) or not prompt_system.get("prompt_reuse"):
+            return ""
+        try:
+            tile_id = str(json.loads(str(tile_reference)).get("tile_id", "")).upper()
+        except json.JSONDecodeError:
+            return ""
+        return _tile_prompt_edits(tile_prompt_edits).get(tile_id, "")
 
     @staticmethod
     def _deterministic_uniform_caption(tile_reference):
@@ -1763,9 +1800,12 @@ class SmartCachedTilePromptGenerator:
         cache_tag,
         negative_prompt_fallback,
         caption_max_side=1344,
+        tile_prompt_edits="",
     ):
         _require_single_image(image, "Tile captioning")
         if self._uses_direct_user(prompt_system) or clip is not None:
+            return []
+        if self._user_edit(tile_reference, prompt_system, tile_prompt_edits):
             return []
         deterministic = self._deterministic_uniform_caption(tile_reference)
         if deterministic is not None and not self._caption_problem(
@@ -1812,8 +1852,14 @@ class SmartCachedTilePromptGenerator:
         cache_tag,
         negative_prompt_fallback,
         caption_max_side=1344,
+        tile_prompt_edits="",
     ):
         _require_single_image(image, "Tile captioning")
+        edit = self._user_edit(tile_reference, prompt_system, tile_prompt_edits)
+        if edit:
+            negative = str(negative_prompt_fallback).strip()
+            audit = json.dumps({"strategy": "user_edit", "positive_prompt": edit})
+            return edit, negative, audit, tile_reference, "Tile prompt EDITED BY YOU | used exactly as written"
         resolver = SmartTilePromptResolver()
         if self._uses_direct_user(prompt_system):
             resolved = resolver.resolve(
