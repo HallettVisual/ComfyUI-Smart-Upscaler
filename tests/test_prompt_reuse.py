@@ -167,5 +167,44 @@ class PlainDecodeTests(unittest.TestCase):
         self.assertEqual((args.disable_comfy_compiler, args.disable_cuda_graphs), (False, False))
 
 
+
+class TilePromptEditTests(PromptReuseTests):
+    def test_parsing_tolerates_continued_lines_and_case(self):
+        from nodes.cache import _tile_prompt_edits
+
+        edits = _tile_prompt_edits(
+            "T006: Thames river with Westminster Bridge,\n  sharp detail\n\n"
+            "t012: open water\nT013:\nstray text"
+        )
+        self.assertEqual(
+            edits,
+            {
+                "T006": "Thames river with Westminster Bridge, sharp detail",
+                "T012": "open water",
+                # A prompt typed on the line under its tile id belongs to that tile.
+                "T013": "stray text",
+            },
+        )
+
+    def test_an_edit_replaces_the_prompt_only_while_reuse_is_on(self):
+        image = _picture(6)
+        model = CountingModel(TILE_CAPTION)
+        node = SmartCachedTilePromptGenerator()
+        edits = "T001: a hand-written prompt"
+        with tempfile.TemporaryDirectory() as cache_directory:
+            with patch("nodes.cache._cache_root", return_value=Path(cache_directory)):
+                on = self._tile_arguments(image, True)
+                self.assertEqual(node.check_lazy_status(None, *on, 0, edits), [])
+                edited = node.generate(None, *on, 0, edits)
+                self.assertEqual(edited[0], "a hand-written prompt")
+                self.assertIn("EDITED BY YOU", edited[4])
+                # Reuse off: the edit waits; the model writes the prompt.
+                off = self._tile_arguments(image, False)
+                self.assertEqual(node.check_lazy_status(None, *off, 0, edits), ["clip"])
+                written = node.generate(model, *off, 0, edits)
+                self.assertIn("red tiled roofs", written[0].lower())
+        self.assertEqual(model.calls, 1)
+
+
 if __name__ == "__main__":
     unittest.main()

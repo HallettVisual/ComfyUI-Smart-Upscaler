@@ -21,6 +21,50 @@ function makeButton(label, title) {
   return button;
 }
 
+// Tile prompt edits live on the Per-tile prompts node ("T006: prompt" lines),
+// so they are saved with the workflow and visible in one place. The Inspector
+// is only the comfortable way to write them.
+const EDIT_LINE = /^\s*(T\d+)\s*:\s*(.*)$/i;
+
+function parseEdits(text) {
+  const edits = new Map();
+  let current = null;
+  for (const line of String(text || "").split(/\r?\n/)) {
+    const match = line.match(EDIT_LINE);
+    if (match) {
+      current = match[1].toUpperCase();
+      edits.set(current, match[2].trim());
+    } else if (current && line.trim()) {
+      edits.set(current, `${edits.get(current)} ${line.trim()}`.trim());
+    }
+  }
+  return edits;
+}
+
+function formatEdits(edits) {
+  return [...edits.entries()]
+    .filter(([, prompt]) => prompt)
+    .sort(([a], [b]) => a.localeCompare(b, undefined, { numeric: true }))
+    .map(([tileId, prompt]) => `${tileId}: ${prompt}`)
+    .join("\n");
+}
+
+function editWidgets() {
+  return (app.graph?._nodes || [])
+    .filter((node) => node.comfyClass === "SmartCachedTilePromptGenerator" || node.type === "SmartCachedTilePromptGenerator")
+    .map((node) => node.widgets?.find((widget) => widget.name === "tile_prompt_edits"))
+    .filter(Boolean);
+}
+
+function switchReuseOn() {
+  for (const node of app.graph?._nodes || []) {
+    if (node.comfyClass !== "SmartUnifiedPromptGuidance" && node.type !== "SmartUnifiedPromptGuidance") continue;
+    const reuse = node.widgets?.find((widget) => widget.name === "prompt_reuse");
+    const on = reuse?.options?.values?.find((value) => String(value).startsWith("On"));
+    if (on) reuse.value = on;
+  }
+}
+
 app.registerExtension({
   name: "ComfyUI.SmartUpscaler.TileInspector",
   async beforeRegisterNodeDef(nodeType, nodeData) {
@@ -88,21 +132,43 @@ app.registerExtension({
 
       const promptTitle = document.createElement("div");
       promptTitle.style.cssText = "font-weight:600;color:#ffd66b;";
-      const prompt = document.createElement("pre");
+      const prompt = document.createElement("textarea");
+      prompt.spellcheck = false;
+      prompt.title = "The exact prompt this tile was drawn with. Change it, then press 'Use my edit next run'.";
       prompt.style.cssText = `
-        min-height: 92px; max-height: 190px; margin: 0; padding: 8px; overflow: auto;
-        white-space: pre-wrap; overflow-wrap: anywhere; border: 1px solid #444a53;
-        border-radius: 4px; background: #121418; color: #e8ebee; font: 12px/1.45 system-ui, sans-serif;
+        min-height: 92px; height: 120px; max-height: 240px; margin: 0; padding: 8px; resize: vertical;
+        border: 1px solid #444a53; border-radius: 4px; background: #121418; color: #e8ebee;
+        font: 12px/1.45 system-ui, sans-serif; box-sizing: border-box; width: 100%;
       `;
-      prompt.textContent = "Queue the workflow to inspect a tile and its exact prompt.";
-      container.append(toolbar, comparison, split, promptTitle, prompt);
+      prompt.placeholder = "Queue the workflow to inspect a tile and its exact prompt.";
+
+      const editBar = document.createElement("div");
+      editBar.style.cssText = "display:flex; align-items:center; gap:6px; width:100%;";
+      const saveEdit = document.createElement("button");
+      saveEdit.textContent = "Use my edit next run";
+      saveEdit.title = "Stores this prompt for this tile on the Per-tile prompts node and turns on Reuse saved prompts. Next run, this tile skips the vision model and uses your text exactly.";
+      const dropEdit = document.createElement("button");
+      dropEdit.textContent = "Back to the model's prompt";
+      dropEdit.title = "Removes your edit for this tile; the next run writes its prompt as usual.";
+      for (const button of [saveEdit, dropEdit]) {
+        button.style.cssText = `
+          height: 28px; padding: 0 10px; border: 1px solid #555b66; border-radius: 4px;
+          background: #30343b; color: #f1f3f5; cursor: pointer;
+        `;
+      }
+      const editStatus = document.createElement("span");
+      editStatus.style.cssText = "flex:1; min-width:0; color:#b9c0c8; text-align:right;";
+      editBar.append(saveEdit, dropEdit, editStatus);
+      container.append(toolbar, comparison, split, promptTitle, prompt, editBar);
+      // Typing in the box must not trigger canvas shortcuts.
+      prompt.addEventListener("keydown", (event) => event.stopPropagation());
 
       this.addDOMWidget("tile_inspector", "smart_tile_inspector", container, {
         serialize: false,
-        getMinHeight: () => 640,
-        getMaxHeight: () => Math.max(640, this.size?.[1] - 20 || 640),
+        getMinHeight: () => 700,
+        getMaxHeight: () => Math.max(700, this.size?.[1] - 20 || 700),
       });
-      this.setSize([760, 760]);
+      this.setSize([760, 820]);
 
       this.smartTileInspector = { records: [], index: 0 };
       const render = () => {
@@ -116,9 +182,43 @@ app.registerExtension({
         sourceImage.src = imageUrl(record.source);
         generatedImage.src = imageUrl(record.generated);
         promptTitle.textContent = `${record.tile_id} | ${record.position} | row ${record.row}, col ${record.column}`;
-        prompt.textContent = record.prompt;
+        prompt.value = record.prompt;
+        showEditStatus(record.tile_id);
         this.setDirtyCanvas(true, true);
       };
+      const showEditStatus = (tileId) => {
+        const widgets = editWidgets();
+        if (!widgets.length) {
+          editStatus.textContent = "Add the Per-tile prompts node to save edits.";
+          return;
+        }
+        editStatus.textContent = parseEdits(widgets[0].value).has(tileId)
+          ? "Your edit is saved for this tile."
+          : "Prompt written by the model.";
+      };
+      const changeEdit = (prompt_text) => {
+        const record = this.smartTileInspector.records[this.smartTileInspector.index];
+        const widgets = editWidgets();
+        if (!record || !widgets.length) {
+          showEditStatus(record?.tile_id);
+          return;
+        }
+        for (const widget of widgets) {
+          const edits = parseEdits(widget.value);
+          if (prompt_text) edits.set(record.tile_id, prompt_text);
+          else edits.delete(record.tile_id);
+          widget.value = formatEdits(edits);
+        }
+        if (prompt_text) switchReuseOn();
+        editStatus.textContent = prompt_text
+          ? "Saved. The next run uses your text for this tile (Reuse is now On)."
+          : "Removed. The next run writes this tile's prompt as usual.";
+        app.graph.setDirtyCanvas(true, true);
+      };
+      saveEdit.addEventListener("click", () => {
+        changeEdit(prompt.value.replace(/\s+/g, " ").trim());
+      });
+      dropEdit.addEventListener("click", () => changeEdit(""));
       const updateSplit = () => {
         const value = Number(split.value);
         generatedImage.style.clipPath = `inset(0 0 0 ${value}%)`;

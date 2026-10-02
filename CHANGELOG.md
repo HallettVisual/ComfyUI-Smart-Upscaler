@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+**Edit any tile's prompt**
+
+- The Tile Inspector's prompt box is now editable. Change a tile's prompt and
+  press *Use my edit next run*; *Back to the model's prompt* removes it.
+- Edits are stored as `T006: prompt` lines in a new box on the Per-tile prompts
+  node, so they save with the workflow. An edited tile skips the vision model
+  and its prompt is used exactly as written.
+- Edits are used only while *7. Reuse saved prompts* is On (saving an edit
+  turns it on), so they never land on a different picture.
+
 ## 1.3.0 — 2026-09-25
 
 **Fixes**
