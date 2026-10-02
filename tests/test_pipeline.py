@@ -55,7 +55,10 @@ class SmartUpscalerPipelineTests(unittest.TestCase):
 
         # The shipped workflow exercises every registered node, so a node that
         # stops being wired in is a real regression rather than a stale test.
-        self.assertEqual(smart_types, set(node_registry.NODE_CLASS_MAPPINGS))
+        # Stitch Tiles - Clean is on trial beside the old stitcher until it
+        # replaces it.
+        on_trial = {"SmartTileStitchClean"}
+        self.assertEqual(smart_types | on_trial, set(node_registry.NODE_CLASS_MAPPINGS))
         self.assertEqual(
             set(node_registry.NODE_CLASS_MAPPINGS),
             set(node_registry.NODE_DISPLAY_NAME_MAPPINGS),
