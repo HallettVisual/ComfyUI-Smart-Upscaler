@@ -153,7 +153,7 @@ class PlainDecodeTests(unittest.TestCase):
                 seen.append((args.disable_comfy_compiler, args.disable_cuda_graphs))
                 return super().generate(tokens, **kwargs)
 
-        with patch("nodes.cache._comfy_args", args):
+        with patch("nodes.cache._comfy_args", args), patch("nodes.cache._CUDA_GRAPH_DECODE_SAFE", False):
             SmartCachedTilePromptGenerator._run_caption(
                 WatchingModel(TILE_CAPTION), _picture(5), "Caption.", "Managed", 64
             )
@@ -167,6 +167,23 @@ class PlainDecodeTests(unittest.TestCase):
                 )
         self.assertEqual(seen, [(True, True)])
         self.assertEqual((args.disable_comfy_compiler, args.disable_cuda_graphs), (False, False))
+
+    def test_fixed_comfyui_keeps_cuda_graphs_for_captions(self):
+        from types import SimpleNamespace
+
+        args = SimpleNamespace(disable_comfy_compiler=False, disable_cuda_graphs=False)
+        seen = []
+
+        class WatchingModel(CountingModel):
+            def generate(self, tokens, **kwargs):
+                seen.append((args.disable_comfy_compiler, args.disable_cuda_graphs))
+                return super().generate(tokens, **kwargs)
+
+        with patch("nodes.cache._comfy_args", args), patch("nodes.cache._CUDA_GRAPH_DECODE_SAFE", True):
+            SmartCachedTilePromptGenerator._run_caption(
+                WatchingModel(TILE_CAPTION), _picture(5), "Caption.", "Managed", 64
+            )
+        self.assertEqual(seen, [(False, False)])
 
 
 
