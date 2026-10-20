@@ -125,7 +125,10 @@ class SmartModelEngineSwitch:
             generator_number or kwargs.get("engine_number") or None,
         )
         name = _slot_name(kwargs, selected)
-        if kwargs.get(name) is None:
+        # An unconnected slot is absent from kwargs. Requesting it would make
+        # ComfyUI fail with "needs input generator_2, but there is no input";
+        # leaving it lets route() explain the problem instead.
+        if name in kwargs and kwargs[name] is None:
             return [name]
         return []
 
@@ -138,12 +141,13 @@ class SmartModelEngineSwitch:
         if value is None:
             value = kwargs.get(f"engine_{selected}")
         if value is None:
+            # Connected but unselected slots arrive as None (never evaluated),
+            # so a slot counts as connected when its key is present at all.
             connected = sorted(
                 {
                     int(key.rsplit("_", 1)[1])
-                    for key, item in kwargs.items()
-                    if item is not None
-                    and key.rsplit("_", 1)[-1].isdigit()
+                    for key in kwargs
+                    if key.rsplit("_", 1)[-1].isdigit()
                     and key.startswith(("generator_", "engine_"))
                 }
             )
@@ -151,6 +155,7 @@ class SmartModelEngineSwitch:
             raise ValueError(
                 f"Generator Switch: generator {selected} is selected but not "
                 f"connected (connected generators: {listed}). Pick a connected "
-                "generator in the dropdown."
+                "generator in the dropdown. If that generator's group is purple, "
+                "it is bypassed: select the group and press Ctrl+B to turn it on."
             )
         return (value,)

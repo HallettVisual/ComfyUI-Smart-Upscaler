@@ -1,8 +1,8 @@
 {
   "id": "e0b33f53-1079-4fe8-a4da-35a5f994394f",
   "revision": 1,
-  "last_node_id": 1278,
-  "last_link_id": 2884,
+  "last_node_id": 1290,
+  "last_link_id": 2900,
   "nodes": [
     {
       "id": 796,
@@ -43,6 +43,9 @@
       "widgets_values": [
         "Original_Image"
       ],
+      "widgets_values_named": {
+        "Constant": "Original_Image"
+      },
       "color": "#2a363b",
       "bgcolor": "#3f5159"
     },
@@ -82,7 +85,10 @@
       },
       "widgets_values": [
         "Positive_Prompts"
-      ]
+      ],
+      "widgets_values_named": {
+        "Constant": "Positive_Prompts"
+      }
     },
     {
       "id": 800,
@@ -121,6 +127,9 @@
       "widgets_values": [
         "Seed"
       ],
+      "widgets_values_named": {
+        "Constant": "Seed"
+      },
       "color": "#1b4669",
       "bgcolor": "#29699c"
     },
@@ -181,7 +190,10 @@
       },
       "widgets_values": [
         "ae.safetensors"
-      ]
+      ],
+      "widgets_values_named": {
+        "vae_name": "ae.safetensors"
+      }
     },
     {
       "id": 1200,
@@ -228,8 +240,7 @@
         "secondTabText": "Send Back",
         "secondTabOffset": 80,
         "secondTabWidth": 65
-      },
-      "widgets_values": []
+      }
     },
     {
       "id": 1202,
@@ -273,8 +284,7 @@
         "cnr_id": "comfy-core",
         "ver": "0.3.60",
         "Node name for S&R": "VAEEncode"
-      },
-      "widgets_values": []
+      }
     },
     {
       "id": 2,
@@ -349,6 +359,11 @@
         "krea2",
         "default"
       ],
+      "widgets_values_named": {
+        "clip_name": "qwen3vl_4b_fp8_scaled.safetensors",
+        "type": "krea2",
+        "device": "default"
+      },
       "color": "#332922",
       "bgcolor": "#593930"
     },
@@ -401,8 +416,7 @@
           "version": "7.1",
           "input_ue_unconnectable": {}
         }
-      },
-      "widgets_values": []
+      }
     },
     {
       "id": 1201,
@@ -481,7 +495,12 @@
         "qwen_3_4b.safetensors",
         "lumina2",
         "default"
-      ]
+      ],
+      "widgets_values_named": {
+        "clip_name": "qwen_3_4b.safetensors",
+        "type": "lumina2",
+        "device": "default"
+      }
     },
     {
       "id": 1218,
@@ -609,15 +628,24 @@
         }
       ],
       "properties": {
+        "cnr_id": "comfyui-smart-upscaler",
+        "ver": "748414eb1db7d82c495da08d503739416790ce2f",
         "Node name for S&R": "SmartTileJobDirector"
       },
       "widgets_values": [
         "all_tiles",
         1,
-        196516190433343,
+        196516190433413,
         "fixed",
         "fixed"
-      ]
+      ],
+      "widgets_values_named": {
+        "selection_mode": "all_tiles",
+        "tile_number": 1,
+        "base_seed": 196516190433413,
+        "control_after_generate": "fixed",
+        "seed_mode": "fixed"
+      }
     },
     {
       "id": 840,
@@ -656,6 +684,9 @@
       "widgets_values": [
         "All_Tiles"
       ],
+      "widgets_values_named": {
+        "Constant": "All_Tiles"
+      },
       "color": "#2a363b",
       "bgcolor": "#3f5159"
     },
@@ -695,7 +726,10 @@
       },
       "widgets_values": [
         "Tile_references"
-      ]
+      ],
+      "widgets_values_named": {
+        "Constant": "Tile_references"
+      }
     },
     {
       "id": 1207,
@@ -734,6 +768,9 @@
       "widgets_values": [
         "Z-Turbo"
       ],
+      "widgets_values_named": {
+        "Constant": "Z-Turbo"
+      },
       "color": "#2a363b",
       "bgcolor": "#3f5159"
     },
@@ -794,6 +831,9 @@
       "widgets_values": [
         "fine detailed image"
       ],
+      "widgets_values_named": {
+        "text": "fine detailed image"
+      },
       "color": "#232",
       "bgcolor": "#353"
     },
@@ -829,6 +869,9 @@
       "widgets_values": [
         "Tile_Seeds"
       ],
+      "widgets_values_named": {
+        "Constant": "Tile_Seeds"
+      },
       "color": "#1b4669",
       "bgcolor": "#29699c"
     },
@@ -840,7 +883,7 @@
         150.82981202562993
       ],
       "size": [
-        213.00000610351563,
+        213.0064453125,
         58
       ],
       "flags": {},
@@ -864,6 +907,9 @@
       "widgets_values": [
         "Positive_Prompts_Out"
       ],
+      "widgets_values_named": {
+        "Constant": "Positive_Prompts_Out"
+      },
       "color": "#2a363b",
       "bgcolor": "#3f5159"
     },
@@ -906,6 +952,9 @@
       "widgets_values": [
         "Tile_References_Out"
       ],
+      "widgets_values_named": {
+        "Constant": "Tile_References_Out"
+      },
       "color": "#232",
       "bgcolor": "#353"
     },
@@ -941,6 +990,9 @@
       "widgets_values": [
         "Tile_References_Out"
       ],
+      "widgets_values_named": {
+        "Constant": "Tile_References_Out"
+      },
       "color": "#232",
       "bgcolor": "#353"
     },
@@ -952,7 +1004,7 @@
         91.57352955508051
       ],
       "size": [
-        213.00000610351563,
+        213.0064453125,
         60
       ],
       "flags": {},
@@ -976,6 +1028,9 @@
       "widgets_values": [
         "Positive_Prompts_Out"
       ],
+      "widgets_values_named": {
+        "Constant": "Positive_Prompts_Out"
+      },
       "color": "#432",
       "bgcolor": "#653"
     },
@@ -1029,15 +1084,33 @@
           {
             "name": "A",
             "selected": true,
-            "url": "/api/view?filename=rgthree.compare._temp_hvupd_00001_.png&type=temp&subfolder=&rand=0.8386367795090892"
+            "url": "/api/view?filename=rgthree.compare._temp_rmsrc_00021_.png&type=temp&subfolder=&rand=0.30872103557714214"
           },
           {
             "name": "B",
             "selected": true,
-            "url": "/api/view?filename=rgthree.compare._temp_hvupd_00002_.png&type=temp&subfolder=&rand=0.2237457114255158"
+            "url": "/api/view?filename=rgthree.compare._temp_rmsrc_00022_.png&type=temp&subfolder=&rand=0.7449286251217622"
           }
         ]
       ],
+      "widgets_values_named": {
+        "rgthree_comparer": {
+          "images": [
+            {
+              "name": "A",
+              "selected": true,
+              "url": "/api/view?filename=rgthree.compare._temp_rmsrc_00021_.png&type=temp&subfolder=&rand=0.30872103557714214",
+              "img": {}
+            },
+            {
+              "name": "B",
+              "selected": true,
+              "url": "/api/view?filename=rgthree.compare._temp_rmsrc_00022_.png&type=temp&subfolder=&rand=0.7449286251217622",
+              "img": {}
+            }
+          ]
+        }
+      },
       "color": "#223",
       "bgcolor": "#335"
     },
@@ -1049,7 +1122,7 @@
         202.74911300527185
       ],
       "size": [
-        211.53333129882813,
+        211.5435546875,
         60
       ],
       "flags": {
@@ -1080,6 +1153,9 @@
       "widgets_values": [
         "Positive_Prompts_Out"
       ],
+      "widgets_values_named": {
+        "Constant": "Positive_Prompts_Out"
+      },
       "color": "#432",
       "bgcolor": "#653"
     },
@@ -1120,6 +1196,7 @@
         "Node name for S&R": "PreviewImage"
       },
       "widgets_values": [],
+      "widgets_values_named": {},
       "color": "#223",
       "bgcolor": "#335"
     },
@@ -1131,7 +1208,7 @@
         -814.999137852007
       ],
       "size": [
-        447.7166809082031,
+        447.78671875,
         82.01746533595485
       ],
       "flags": {},
@@ -1164,7 +1241,10 @@
       },
       "widgets_values": [
         "4x_UniversalUpscalerV2-Sharp_101000_G.pth"
-      ]
+      ],
+      "widgets_values_named": {
+        "model_name": "4x_UniversalUpscalerV2-Sharp_101000_G.pth"
+      }
     },
     {
       "id": 1063,
@@ -1203,6 +1283,7 @@
         "Node name for S&R": "PreviewAny"
       },
       "widgets_values": [],
+      "widgets_values_named": {},
       "color": "#323",
       "bgcolor": "#535"
     },
@@ -1254,6 +1335,9 @@
       "widgets_values": [
         "Smart-Upscaler"
       ],
+      "widgets_values_named": {
+        "filename_prefix": "Smart-Upscaler"
+      },
       "color": "#223",
       "bgcolor": "#335"
     },
@@ -1289,6 +1373,9 @@
       "widgets_values": [
         "Original_Image"
       ],
+      "widgets_values_named": {
+        "Constant": "Original_Image"
+      },
       "color": "#2a363b",
       "bgcolor": "#3f5159"
     },
@@ -1384,12 +1471,12 @@
           "link": null
         },
         {
-          "localized_name": "vision_model_id",
-          "name": "vision_model_id",
+          "localized_name": "tile_prompt_edits",
+          "name": "tile_prompt_edits",
           "shape": 7,
           "type": "STRING",
           "widget": {
-            "name": "vision_model_id"
+            "name": "tile_prompt_edits"
           },
           "link": null
         }
@@ -1440,6 +1527,8 @@
       ],
       "title": "⚡Per-tile prompts (runs once per tile)⚡",
       "properties": {
+        "cnr_id": "comfyui-smart-upscaler",
+        "ver": "748414eb1db7d82c495da08d503739416790ce2f",
         "Node name for S&R": "SmartCachedTilePromptGenerator"
       },
       "widgets_values": [
@@ -1447,8 +1536,17 @@
         "read_write",
         "qwen3vl_4b_fp8_local_target_v29_structured_detail_v13",
         "changed geometry, duplicated objects, artifacts, seams",
-        0
+        0,
+        ""
       ],
+      "widgets_values_named": {
+        "caption_generation": "Managed by Prompt Director (recommended)",
+        "cache_mode": "read_write",
+        "cache_tag": "qwen3vl_4b_fp8_local_target_v29_structured_detail_v13",
+        "negative_prompt_fallback": "changed geometry, duplicated objects, artifacts, seams",
+        "caption_max_side": 0,
+        "tile_prompt_edits": ""
+      },
       "color": "#009933",
       "bgcolor": "#653"
     },
@@ -1473,8 +1571,11 @@
       "title": "MODEL DOWNLOADS - read this first",
       "properties": {},
       "widgets_values": [
-        "# Model downloads\n\nEverything here is free. Put each file in the folder shown, then restart\nComfyUI. About **13 GB** in total.\n\n---\n\n## 1. The model that reads your picture\n\n`ComfyUI/models/text_encoders/`\n\n- [qwen3vl_4b_fp8_scaled.safetensors](https://huggingface.co/Comfy-Org/Krea-2/resolve/main/text_encoders/qwen3vl_4b_fp8_scaled.safetensors) - 4.9 GB\n\n> In the loader, **type must be `krea2`**. That is what gives it eyes. Any other\n> setting and your prompts come back empty.\n\n---\n\n## 2. The model that draws - Z-Image Turbo\n\n`ComfyUI/models/diffusion_models/` - pick **one**:\n\n| File | Size | Who it is for |\n|---|---|---|\n| [z_image_turbo_bf16.safetensors](https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/diffusion_models/z_image_turbo_bf16.safetensors) | 11.5 GB | works on any card |\n| [z_image_turbo_int8_convrot.safetensors](https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/diffusion_models/z_image_turbo_int8_convrot.safetensors) | 5.8 GB | smaller, faster |\n| `z_image_turbo_nvfp4.safetensors` | 4.2 GB | **RTX 50-series only** - [same folder](https://huggingface.co/Comfy-Org/z_image_turbo/tree/main/split_files/diffusion_models) |\n\nThe workflow arrives pointing at the nvfp4 file. **If you are not on a 50-series\ncard, open the Load Diffusion Model node and pick the one you downloaded.**\n\n`ComfyUI/models/text_encoders/`\n\n- [qwen_3_4b.safetensors](https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/text_encoders/qwen_3_4b.safetensors) - 7.5 GB\n\n`ComfyUI/models/vae/`\n\n- [ae.safetensors](https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/vae/ae.safetensors) - 0.3 GB\n\n---\n\n## 3. Tile ControlNet - holds your layout steady\n\n`ComfyUI/models/model_patches/`\n\nThe workflow is set to the **Tile** model from Alibaba's Z-Image-Turbo-Fun\nControlNet family. Find it on the\n[alibaba-pai page](https://huggingface.co/alibaba-pai) - look for\n`Z-Image-Turbo-Fun-Controlnet-Tile`.\n\nThe **Union** model also works - just select it in the ModelPatchLoader node:\n\n- [Z-Image-Turbo-Fun-Controlnet-Union.safetensors](https://huggingface.co/alibaba-pai/Z-Image-Turbo-Fun-Controlnet-Union/resolve/main/Z-Image-Turbo-Fun-Controlnet-Union.safetensors)\n\n---\n\n## 4. Optional - an ESRGAN enlarger\n\n`ComfyUI/models/upscale_models/`\n\nOnly needed if you switch the Tile Planner to *AI upscaler model*. Any 4x model\nfrom [OpenModelDB](https://openmodeldb.info/) will do. Out of the box the\nworkflow uses Lanczos and needs nothing here, so that loader ships\n**unwired** - connect it to the planner's `upscale_model` input when you\nwant it.\n\n---\n\n## Where everything goes\n\n```\nComfyUI/\n└── models/\n    ├── text_encoders/\n    │   ├── qwen3vl_4b_fp8_scaled.safetensors    <- reads your picture\n    │   └── qwen_3_4b.safetensors                <- Z-Image text encoder\n    ├── diffusion_models/\n    │   └── z_image_turbo_*.safetensors          <- pick one\n    ├── vae/\n    │   └── ae.safetensors\n    ├── model_patches/\n    │   └── Z-Image-Turbo-Fun-Controlnet-Tile-*.safetensors\n    └── upscale_models/\n        └── (optional 4x model)\n```\n\n## Custom nodes you need\n\nInstall these three from the ComfyUI Manager:\n\n- **ComfyUI-Smart-Upscaler** (this pack)\n- **ComfyUI-KJNodes** - the Set/Get wires\n- **rgthree-comfy** - the before/after sliders\n"
+        "# Model downloads\n\nEverything here is free. Put each file in the folder shown, then restart\nComfyUI. About **18 GB** in total.\n\n---\n\n## 1. The model that reads your picture\n\n`ComfyUI/models/text_encoders/`\n\n- [qwen3vl_4b_fp8_scaled.safetensors](https://huggingface.co/Comfy-Org/Krea-2/resolve/main/text_encoders/qwen3vl_4b_fp8_scaled.safetensors) - 4.9 GB\n\n> In the loader, **type must be `krea2`**. That is what gives it eyes. Any other\n> setting and your prompts come back empty.\n\n---\n\n## 2. The model that draws - Z-Image Turbo\n\n`ComfyUI/models/diffusion_models/` - pick **one**:\n\n| File | Size | Who it is for |\n|---|---|---|\n| [z_image_turbo_bf16.safetensors](https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/diffusion_models/z_image_turbo_bf16.safetensors) | 11.5 GB | works on any card |\n| [z_image_turbo_int8_convrot.safetensors](https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/diffusion_models/z_image_turbo_int8_convrot.safetensors) | 5.8 GB | smaller, faster |\n| `z_image_turbo_nvfp4.safetensors` | 4.2 GB | **RTX 50-series only** - [same folder](https://huggingface.co/Comfy-Org/z_image_turbo/tree/main/split_files/diffusion_models) |\n\nThe workflow arrives pointing at the nvfp4 file. **If you are not on a 50-series\ncard, open the Load Diffusion Model node and pick the one you downloaded.**\n\n`ComfyUI/models/text_encoders/`\n\n- [qwen_3_4b.safetensors](https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/text_encoders/qwen_3_4b.safetensors) - 7.5 GB\n\n`ComfyUI/models/vae/`\n\n- [ae.safetensors](https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/vae/ae.safetensors) - 0.3 GB\n\n---\n\n## 3. Tile ControlNet - holds your layout and textures steady\n\n`ComfyUI/models/model_patches/`\n\n- [Z-Image-Turbo-Fun-Controlnet-Tile-2.1-2601-8steps.safetensors](https://huggingface.co/alibaba-pai/Z-Image-Turbo-Fun-Controlnet-Union-2.1/resolve/main/Z-Image-Turbo-Fun-Controlnet-Tile-2.1-2601-8steps.safetensors) - 6.7 GB\n\nThis full model keeps surfaces such as knit, brick and fabric the same across\nevery tile. The 2 GB **lite** version from the same page also works if space is\ntight, but its weaker hold lets textures change between tiles.\n\n---\n\n## 4. Optional - an ESRGAN enlarger\n\n`ComfyUI/models/upscale_models/`\n\nOnly needed if you switch the Tile Planner to *AI upscaler model*. Any 4x model\nfrom [OpenModelDB](https://openmodeldb.info/) will do. Out of the box the\nworkflow uses Lanczos and needs nothing here, so that loader ships\n**unwired** - connect it to the planner's `upscale_model` input when you\nwant it.\n\n---\n\n## Where everything goes\n\n```\nComfyUI/\n└── models/\n    ├── text_encoders/\n    │   ├── qwen3vl_4b_fp8_scaled.safetensors    <- reads your picture\n    │   └── qwen_3_4b.safetensors                <- Z-Image text encoder\n    ├── diffusion_models/\n    │   └── z_image_turbo_*.safetensors          <- pick one\n    ├── vae/\n    │   └── ae.safetensors\n    ├── model_patches/\n    │   └── Z-Image-Turbo-Fun-Controlnet-Tile-*.safetensors\n    └── upscale_models/\n        └── (optional 4x model)\n```\n\n## Custom nodes you need\n\nInstall these three from the ComfyUI Manager:\n\n- **ComfyUI-Smart-Upscaler** (this pack)\n- **ComfyUI-KJNodes** - the Set/Get wires\n- **rgthree-comfy** - the before/after sliders\n"
       ],
+      "widgets_values_named": {
+        "text": "# Model downloads\n\nEverything here is free. Put each file in the folder shown, then restart\nComfyUI. About **18 GB** in total.\n\n---\n\n## 1. The model that reads your picture\n\n`ComfyUI/models/text_encoders/`\n\n- [qwen3vl_4b_fp8_scaled.safetensors](https://huggingface.co/Comfy-Org/Krea-2/resolve/main/text_encoders/qwen3vl_4b_fp8_scaled.safetensors) - 4.9 GB\n\n> In the loader, **type must be `krea2`**. That is what gives it eyes. Any other\n> setting and your prompts come back empty.\n\n---\n\n## 2. The model that draws - Z-Image Turbo\n\n`ComfyUI/models/diffusion_models/` - pick **one**:\n\n| File | Size | Who it is for |\n|---|---|---|\n| [z_image_turbo_bf16.safetensors](https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/diffusion_models/z_image_turbo_bf16.safetensors) | 11.5 GB | works on any card |\n| [z_image_turbo_int8_convrot.safetensors](https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/diffusion_models/z_image_turbo_int8_convrot.safetensors) | 5.8 GB | smaller, faster |\n| `z_image_turbo_nvfp4.safetensors` | 4.2 GB | **RTX 50-series only** - [same folder](https://huggingface.co/Comfy-Org/z_image_turbo/tree/main/split_files/diffusion_models) |\n\nThe workflow arrives pointing at the nvfp4 file. **If you are not on a 50-series\ncard, open the Load Diffusion Model node and pick the one you downloaded.**\n\n`ComfyUI/models/text_encoders/`\n\n- [qwen_3_4b.safetensors](https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/text_encoders/qwen_3_4b.safetensors) - 7.5 GB\n\n`ComfyUI/models/vae/`\n\n- [ae.safetensors](https://huggingface.co/Comfy-Org/z_image_turbo/resolve/main/split_files/vae/ae.safetensors) - 0.3 GB\n\n---\n\n## 3. Tile ControlNet - holds your layout and textures steady\n\n`ComfyUI/models/model_patches/`\n\n- [Z-Image-Turbo-Fun-Controlnet-Tile-2.1-2601-8steps.safetensors](https://huggingface.co/alibaba-pai/Z-Image-Turbo-Fun-Controlnet-Union-2.1/resolve/main/Z-Image-Turbo-Fun-Controlnet-Tile-2.1-2601-8steps.safetensors) - 6.7 GB\n\nThis full model keeps surfaces such as knit, brick and fabric the same across\nevery tile. The 2 GB **lite** version from the same page also works if space is\ntight, but its weaker hold lets textures change between tiles.\n\n---\n\n## 4. Optional - an ESRGAN enlarger\n\n`ComfyUI/models/upscale_models/`\n\nOnly needed if you switch the Tile Planner to *AI upscaler model*. Any 4x model\nfrom [OpenModelDB](https://openmodeldb.info/) will do. Out of the box the\nworkflow uses Lanczos and needs nothing here, so that loader ships\n**unwired** - connect it to the planner's `upscale_model` input when you\nwant it.\n\n---\n\n## Where everything goes\n\n```\nComfyUI/\n└── models/\n    ├── text_encoders/\n    │   ├── qwen3vl_4b_fp8_scaled.safetensors    <- reads your picture\n    │   └── qwen_3_4b.safetensors                <- Z-Image text encoder\n    ├── diffusion_models/\n    │   └── z_image_turbo_*.safetensors          <- pick one\n    ├── vae/\n    │   └── ae.safetensors\n    ├── model_patches/\n    │   └── Z-Image-Turbo-Fun-Controlnet-Tile-*.safetensors\n    └── upscale_models/\n        └── (optional 4x model)\n```\n\n## Custom nodes you need\n\nInstall these three from the ComfyUI Manager:\n\n- **ComfyUI-Smart-Upscaler** (this pack)\n- **ComfyUI-KJNodes** - the Set/Get wires\n- **rgthree-comfy** - the before/after sliders\n"
+      },
       "color": "#222",
       "bgcolor": "#000"
     },
@@ -1510,6 +1611,9 @@
       "widgets_values": [
         "Tiled_Images_Out"
       ],
+      "widgets_values_named": {
+        "Constant": "Tiled_Images_Out"
+      },
       "color": "#2a363b",
       "bgcolor": "#3f5159"
     },
@@ -1534,6 +1638,9 @@
       "widgets_values": [
         "This writes the master prompt, and every tile prompt comes from it.\n\n**It is already filled in for this workflow** - there is nothing to load.\n\n**Load Preset** (at the bottom) starts out empty. It fills up with add-on\npreset packs you install, and with your own presets saved by the\n**Save My Preset to Disk** button below it.\n\n1. **Instructions** - the job. Edit freely; this is the whole recipe.\n2. **Your request** - optional. Only fill this in if you want something *changed*, e.g. \"make it night time\". Leave blank for a plain upscale.\n3. **Not in this image** - optional. If the model keeps seeing something that is not there, type it here and it is banned.\n4. **Extra words** - added to the end of every tile prompt.\n5. **How much detail** - more detail = better prompts, slower. *Adaptive* is a good middle. *Maximum* names everything.\n6. **Delete colour names** - leave OFF. Only for the rare case where a model tints whole squares one flat shade."
       ],
+      "widgets_values_named": {
+        "text": "This writes the master prompt, and every tile prompt comes from it.\n\n**It is already filled in for this workflow** - there is nothing to load.\n\n**Load Preset** (at the bottom) starts out empty. It fills up with add-on\npreset packs you install, and with your own presets saved by the\n**Save My Preset to Disk** button below it.\n\n1. **Instructions** - the job. Edit freely; this is the whole recipe.\n2. **Your request** - optional. Only fill this in if you want something *changed*, e.g. \"make it night time\". Leave blank for a plain upscale.\n3. **Not in this image** - optional. If the model keeps seeing something that is not there, type it here and it is banned.\n4. **Extra words** - added to the end of every tile prompt.\n5. **How much detail** - more detail = better prompts, slower. *Adaptive* is a good middle. *Maximum* names everything.\n6. **Delete colour names** - leave OFF. Only for the rare case where a model tints whole squares one flat shade."
+      },
       "color": "#432",
       "bgcolor": "#653"
     },
@@ -1558,6 +1665,9 @@
       "widgets_values": [
         "# Smart Upscaler\n\nMost upscalers look at one small square at a time, so they guess. A patch of\nroof becomes \"brown texture\". This one **reads your whole picture first**, then\nwrites a separate, accurate prompt for every square before anything is redrawn.\n\n## Run it in four steps\n\n1. **Load your picture** in box 1. It arrives pointing at\n   `Upscale_Test_Image.png` - copy that file from this pack's `workflow`\n   folder into `ComfyUI/input/` first, or just pick a picture of your own.\n2. **Nothing to set up in box 2.** The Prompt Director already carries\n   the right instructions for this workflow. Leave it alone the first time.\n3. **Nothing to set up in boxes 5 and 6 either.** The Tile Planner ships at\n   2x; raise its **scale_factor** when you want bigger.\n4. Press **Run**.\n\n## When it finishes\n\n- Box 6 has a **slider** to drag between the original and the result, and the\n  saved file.\n- Box 3 shows **the prompt written for every single tile**. If part of the\n  picture came out wrong, read its prompt - that is almost always the reason.\n\n## Taking longer than you expected?\n\nBig scales make a lot of tiles. Check the **\"Before you run\"** box in box 2 -\nit tells you how many tiles you are about to render before you commit.\n\nEvery step is cached. Running again only redoes what you changed.\n\n**Model downloads are in the note to the right.** ->"
       ],
+      "widgets_values_named": {
+        "text": "# Smart Upscaler\n\nMost upscalers look at one small square at a time, so they guess. A patch of\nroof becomes \"brown texture\". This one **reads your whole picture first**, then\nwrites a separate, accurate prompt for every square before anything is redrawn.\n\n## Run it in four steps\n\n1. **Load your picture** in box 1. It arrives pointing at\n   `Upscale_Test_Image.png` - copy that file from this pack's `workflow`\n   folder into `ComfyUI/input/` first, or just pick a picture of your own.\n2. **Nothing to set up in box 2.** The Prompt Director already carries\n   the right instructions for this workflow. Leave it alone the first time.\n3. **Nothing to set up in boxes 5 and 6 either.** The Tile Planner ships at\n   2x; raise its **scale_factor** when you want bigger.\n4. Press **Run**.\n\n## When it finishes\n\n- Box 6 has a **slider** to drag between the original and the result, and the\n  saved file.\n- Box 3 shows **the prompt written for every single tile**. If part of the\n  picture came out wrong, read its prompt - that is almost always the reason.\n\n## Taking longer than you expected?\n\nBig scales make a lot of tiles. Check the **\"Before you run\"** box in box 2 -\nit tells you how many tiles you are about to render before you commit.\n\nEvery step is cached. Running again only redoes what you changed.\n\n**Model downloads are in the note to the right.** ->"
+      },
       "color": "#432",
       "bgcolor": "#653"
     },
@@ -1582,6 +1692,9 @@
       "widgets_values": [
         "### Your picture\n\nDrop any photo in. Small, soft, or old pictures are exactly what this is for.\n\n### The upscaler model above it\n\n**Optional, and deliberately not wired up.** Out of the box the workflow uses\n**Lanczos**, which needs no download at all.\n\nTo use an AI enlarger instead: download a 4x model, pick it in that loader,\ndrag its output into the Tile Planner's **upscale_model** input, and set the\nplanner's first dropdown to *AI upscaler model*."
       ],
+      "widgets_values_named": {
+        "text": "### Your picture\n\nDrop any photo in. Small, soft, or old pictures are exactly what this is for.\n\n### The upscaler model above it\n\n**Optional, and deliberately not wired up.** Out of the box the workflow uses\n**Lanczos**, which needs no download at all.\n\nTo use an AI enlarger instead: download a 4x model, pick it in that loader,\ndrag its output into the Tile Planner's **upscale_model** input, and set the\nplanner's first dropdown to *AI upscaler model*."
+      },
       "color": "#432",
       "bgcolor": "#653"
     },
@@ -1621,7 +1734,10 @@
       },
       "widgets_values": [
         "Negative_Prompts"
-      ]
+      ],
+      "widgets_values_named": {
+        "Constant": "Negative_Prompts"
+      }
     },
     {
       "id": 1250,
@@ -1644,6 +1760,9 @@
       "widgets_values": [
         "**scale_factor** - how many times bigger. 2 = double. This is the one dial most people change. Bigger = more tiles = longer.\n\n**min / max_tile_size** - how big each square is, in final pixels. Leave at 1024-1536. Lower them only if you run out of video memory.\n\n**overlap / feather** - how much neighbouring squares share, so you cannot see the joins. If you spot seams, raise **overlap to 128** and **feather to 64** - on most pictures this costs no extra tiles at all.\n\n**upscale_method** - Lanczos (honest) or an AI model (sharper, but invents detail early).\n\nEverything else is fine as it is. Check the **\"Before you run\"** box below for how many tiles you are about to make."
       ],
+      "widgets_values_named": {
+        "text": "**scale_factor** - how many times bigger. 2 = double. This is the one dial most people change. Bigger = more tiles = longer.\n\n**min / max_tile_size** - how big each square is, in final pixels. Leave at 1024-1536. Lower them only if you run out of video memory.\n\n**overlap / feather** - how much neighbouring squares share, so you cannot see the joins. If you spot seams, raise **overlap to 128** and **feather to 64** - on most pictures this costs no extra tiles at all.\n\n**upscale_method** - Lanczos (honest) or an AI model (sharper, but invents detail early).\n\nEverything else is fine as it is. Check the **\"Before you run\"** box below for how many tiles you are about to make."
+      },
       "color": "#432",
       "bgcolor": "#653"
     },
@@ -1713,7 +1832,11 @@
       "widgets_values": [
         "z_image_turbo_nvfp4.safetensors",
         "default"
-      ]
+      ],
+      "widgets_values_named": {
+        "unet_name": "z_image_turbo_nvfp4.safetensors",
+        "weight_dtype": "default"
+      }
     },
     {
       "id": 1065,
@@ -1741,6 +1864,13 @@
           "name": "source_tile",
           "type": "IMAGE",
           "link": 2837
+        },
+        {
+          "localized_name": "prompt_system",
+          "name": "prompt_system",
+          "shape": 7,
+          "type": "SMART_PROMPT_SYSTEM",
+          "link": null
         },
         {
           "localized_name": "color_match_method",
@@ -1783,6 +1913,8 @@
       ],
       "title": "Colour match to the original (optional)",
       "properties": {
+        "cnr_id": "comfyui-smart-upscaler",
+        "ver": "748414eb1db7d82c495da08d503739416790ce2f",
         "Node name for S&R": "SmartTileColorMatch"
       },
       "widgets_values": [
@@ -1790,6 +1922,11 @@
         50,
         "Match source brightness (recommended)"
       ],
+      "widgets_values_named": {
+        "color_match_method": "luminance",
+        "color_match_strength": 50,
+        "color_preset": "Match source brightness (recommended)"
+      },
       "color": "#232",
       "bgcolor": "#353"
     },
@@ -1812,8 +1949,11 @@
       "title": "Finishing dials",
       "properties": {},
       "widgets_values": [
-        "### Colour match to the original\n\nFixes squares that came back slightly the wrong shade. One dropdown does it:\nit ships on *Match source brightness*, which is right for a normal upscale.\n\nSet it to **No colour change** if you asked for a look change (night, style),\notherwise it will drag your new look back to the old colours.\n\n### Stitch the tiles back together\n\nOne dropdown here too. It ships on *Photo upscale, seams hidden* - the\nsetting for a picture that was already correct and just needs to be bigger.\n\nPick an **I changed the look** preset instead when you asked for a style, a\ntime of day, or a repair, so your new look is not pulled back to the original.\n\nThe five dials each preset writes live under **Advanced** on the node. You\nonly need them if a preset is close but not quite right.\n\n### The two comparison sliders\n\nDrag the divider to see before and after. The top one shows the plain\nenlargement, so you can tell what the model actually added.\n\n### Tile Inspector\n\nClick any tile to see the exact prompt that made it."
+        "### Colour match to the original\n\nFixes squares that came back slightly the wrong shade. One dropdown does it:\nit ships on *Match source brightness*, which is right for a normal upscale.\n\nSet it to **No colour change** if you asked for a look change (night, style),\notherwise it will drag your new look back to the old colours.\n\n### Stitch the tiles back together\n\nPuts the tiles back and fades them into each other across their overlap. It never mixes the original's fine detail back in, so it cannot add a speckled look.\n\nShips on *Leave the tiles exactly as drawn* - the colour match above already evens out the tiles. If you can see the joins, switch **colors** to *Keep the new look, even out the tiles*.\n\n### The two comparison sliders\n\nDrag the divider to see before and after. The top one shows the plain\nenlargement, so you can tell what the model actually added.\n\n### Tile Inspector\n\nClick any tile to see the exact prompt that made it."
       ],
+      "widgets_values_named": {
+        "text": "### Colour match to the original\n\nFixes squares that came back slightly the wrong shade. One dropdown does it:\nit ships on *Match source brightness*, which is right for a normal upscale.\n\nSet it to **No colour change** if you asked for a look change (night, style),\notherwise it will drag your new look back to the old colours.\n\n### Stitch the tiles back together\n\nPuts the tiles back and fades them into each other across their overlap. It never mixes the original's fine detail back in, so it cannot add a speckled look.\n\nShips on *Leave the tiles exactly as drawn* - the colour match above already evens out the tiles. If you can see the joins, switch **colors** to *Keep the new look, even out the tiles*.\n\n### The two comparison sliders\n\nDrag the divider to see before and after. The top one shows the plain\nenlargement, so you can tell what the model actually added.\n\n### Tile Inspector\n\nClick any tile to see the exact prompt that made it."
+      },
       "color": "#432",
       "bgcolor": "#653"
     },
@@ -1850,6 +1990,9 @@
       "widgets_values": [
         "Tiled_Images_Out"
       ],
+      "widgets_values_named": {
+        "Constant": "Tiled_Images_Out"
+      },
       "color": "#2a363b",
       "bgcolor": "#3f5159"
     },
@@ -1892,6 +2035,9 @@
       "widgets_values": [
         "Tiled_Images_Out"
       ],
+      "widgets_values_named": {
+        "Constant": "Tiled_Images_Out"
+      },
       "color": "#2a363b",
       "bgcolor": "#3f5159"
     },
@@ -1934,6 +2080,9 @@
       "widgets_values": [
         "Tile_Seeds"
       ],
+      "widgets_values_named": {
+        "Constant": "Tile_Seeds"
+      },
       "color": "#1b4669",
       "bgcolor": "#29699c"
     },
@@ -1971,6 +2120,9 @@
       "widgets_values": [
         "Tile_references"
       ],
+      "widgets_values_named": {
+        "Constant": "Tile_references"
+      },
       "color": "#232",
       "bgcolor": "#353"
     },
@@ -2008,6 +2160,9 @@
       "widgets_values": [
         "All_Tiles"
       ],
+      "widgets_values_named": {
+        "Constant": "All_Tiles"
+      },
       "color": "#2a363b",
       "bgcolor": "#3f5159"
     },
@@ -2045,6 +2200,9 @@
       "widgets_values": [
         "Positive_Prompts"
       ],
+      "widgets_values_named": {
+        "Constant": "Positive_Prompts"
+      },
       "color": "#432",
       "bgcolor": "#653"
     },
@@ -2082,6 +2240,9 @@
       "widgets_values": [
         "Negative_Prompts"
       ],
+      "widgets_values_named": {
+        "Constant": "Negative_Prompts"
+      },
       "color": "#432",
       "bgcolor": "#653"
     },
@@ -2119,6 +2280,9 @@
       "widgets_values": [
         "Seed"
       ],
+      "widgets_values_named": {
+        "Constant": "Seed"
+      },
       "color": "#1b4669",
       "bgcolor": "#29699c"
     },
@@ -2143,6 +2307,9 @@
       "widgets_values": [
         "**Skip it for a normal run.** Leave the dropdown on *All tiles*.\n\nSwitch to **One tile test** and pick a tile number to render just that one\nsquare. Every prompt is still written and logged - only the drawing is limited.\n\nUse it to try a different denoise or strength setting in seconds instead of\nwaiting for the whole picture.\n\nTile numbers are the T-numbers shown in the tile map and the prompt log."
       ],
+      "widgets_values_named": {
+        "text": "**Skip it for a normal run.** Leave the dropdown on *All tiles*.\n\nSwitch to **One tile test** and pick a tile number to render just that one\nsquare. Every prompt is still written and logged - only the drawing is limited.\n\nUse it to try a different denoise or strength setting in seconds instead of\nwaiting for the whole picture.\n\nTile numbers are the T-numbers shown in the tile map and the prompt log."
+      },
       "color": "#432",
       "bgcolor": "#653"
     },
@@ -2167,6 +2334,9 @@
       "widgets_values": [
         "How the picture is enlarged before the model touches it.\n\n**Lanczos** (the default) just makes it bigger and keeps everything honest.\n**AI upscaler model** can look sharper, but it invents small detail before the model ever sees it.\n\nTry both on your own picture. Results are cached, so the second try is quick."
       ],
+      "widgets_values_named": {
+        "text": "How the picture is enlarged before the model touches it.\n\n**Lanczos** (the default) just makes it bigger and keeps everything honest.\n**AI upscaler model** can look sharper, but it invents small detail before the model ever sees it.\n\nTry both on your own picture. Results are cached, so the second try is quick."
+      },
       "color": "#432",
       "bgcolor": "#653"
     },
@@ -2179,7 +2349,7 @@
       ],
       "size": [
         290,
-        60
+        82
       ],
       "flags": {},
       "order": 41,
@@ -2197,6 +2367,16 @@
           "type": "FLOAT",
           "widget": {
             "name": "shift"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "sampling",
+          "name": "sampling",
+          "shape": 7,
+          "type": "COMBO",
+          "widget": {
+            "name": "sampling"
           },
           "link": null
         }
@@ -2225,8 +2405,13 @@
         "secondTabWidth": 65
       },
       "widgets_values": [
-        1.5
-      ]
+        1.5,
+        "flow"
+      ],
+      "widgets_values_named": {
+        "shift": 1.5,
+        "sampling": "flow"
+      }
     },
     {
       "id": 1197,
@@ -2283,8 +2468,11 @@
         "secondTabWidth": 65
       },
       "widgets_values": [
-        "Z-Image-Turbo-Fun-Controlnet-Tile-2.1-lite-2601-8steps.safetensors"
-      ]
+        "Z-Image-Turbo-Fun-Controlnet-Tile-2.1-2601-8steps.safetensors"
+      ],
+      "widgets_values_named": {
+        "name": "Z-Image-Turbo-Fun-Controlnet-Tile-2.1-2601-8steps.safetensors"
+      }
     },
     {
       "id": 1221,
@@ -2397,12 +2585,18 @@
       ],
       "title": "One-tile test",
       "properties": {
+        "cnr_id": "comfyui-smart-upscaler",
+        "ver": "748414eb1db7d82c495da08d503739416790ce2f",
         "Node name for S&R": "SmartSamplerTileSelector"
       },
       "widgets_values": [
         "All tiles (production)",
         6
-      ]
+      ],
+      "widgets_values_named": {
+        "processing_mode": "All tiles (production)",
+        "tile_number": 6
+      }
     },
     {
       "id": 1254,
@@ -2423,8 +2617,11 @@
       "title": "The four dials that change how it looks",
       "properties": {},
       "widgets_values": [
-        "**denoise** (in KSampler, bottom dial) - how much freedom the model has.\nShips at `0.6`. `0.4` stays very close to your picture, `0.65` invents\nmore detail. Too high and it starts adding things that were never there.\n**This is the main dial.**\n\n**strength** (Tile ControlNet) - how tightly the layout is held. `0.6` is a good\nmiddle. Higher = safer, flatter. Lower = more invention.\n\n**steps** - 8 to 12 is plenty for a Turbo model. More is rarely better.\n\n**shift** (Model Sampling) - fine tuning. Leave at 1.5 unless you know why.\n\n**CFG** 1.0 to 1.5 A hack above 1.0 to fix the low denoise errors.\n---\n\n**Swapping models:** this whole green block is replaceable. Any model that takes\na picture and a prompt and returns a picture can go here - just feed the result\ninto `Set_Z-Turbo` and add it to the Generator switch.\n\nZ-Turbo has this strange behavoir where it introduces \"stick\" like objects on lower denoise.  "
+        "**denoise** (in KSampler, bottom dial) - how much freedom the model has.\nShips at `0.55`. `0.4` stays very close to your picture, `0.65` invents\nmore detail. Too high and it starts adding things that were never there.\n**This is the main dial.**\n\n**strength** (Tile ControlNet) - how tightly layout and textures are held. Ships at\n`0.8`. Up to `1.0` = closest to your picture. Below `0.65` = textures start to change between tiles.\n\n**steps** - 8 to 12 is plenty for a Turbo model. More is rarely better.\n\n**shift** (Model Sampling) - fine tuning. Leave at 1.5 unless you know why.\n\n**CFG** 1.0 to 1.5 A hack above 1.0 to fix the low denoise errors.\n---\n\n**Swapping models:** this whole green block is replaceable. Any model that takes\na picture and a prompt and returns a picture can go here - just feed the result\ninto `Set_Z-Turbo` and add it to the Generator switch.\n\nZ-Turbo has this strange behavoir where it introduces \"stick\" like objects on lower denoise.  "
       ],
+      "widgets_values_named": {
+        "text": "**denoise** (in KSampler, bottom dial) - how much freedom the model has.\nShips at `0.55`. `0.4` stays very close to your picture, `0.65` invents\nmore detail. Too high and it starts adding things that were never there.\n**This is the main dial.**\n\n**strength** (Tile ControlNet) - how tightly layout and textures are held. Ships at\n`0.8`. Up to `1.0` = closest to your picture. Below `0.65` = textures start to change between tiles.\n\n**steps** - 8 to 12 is plenty for a Turbo model. More is rarely better.\n\n**shift** (Model Sampling) - fine tuning. Leave at 1.5 unless you know why.\n\n**CFG** 1.0 to 1.5 A hack above 1.0 to fix the low denoise errors.\n---\n\n**Swapping models:** this whole green block is replaceable. Any model that takes\na picture and a prompt and returns a picture can go here - just feed the result\ninto `Set_Z-Turbo` and add it to the Generator switch.\n\nZ-Turbo has this strange behavoir where it introduces \"stick\" like objects on lower denoise.  "
+      },
       "color": "#432",
       "bgcolor": "#653"
     },
@@ -2465,6 +2662,7 @@
         "Node name for S&R": "PreviewAny"
       },
       "widgets_values": [],
+      "widgets_values_named": {},
       "color": "#223",
       "bgcolor": "#335"
     },
@@ -2489,6 +2687,9 @@
       "widgets_values": [
         "Every tile prompt this run produced, in order, plus the scene summary the\nwhole picture produced.\n\nThey are also written to disk:\n\n```\nComfyUI/output/Smart-Upscaler/logs/\n```\n\n**This is the first place to look when something comes out wrong.** If tile 4\npainted a bush where there should be a wall, its prompt will say \"bush\" - and\nthen you know it is a reading problem, not a model problem.\n\nThe purple box to the left shows the **scene summary**: what the whole picture\nis, which large areas repeat across tiles, and what the main subject is."
       ],
+      "widgets_values_named": {
+        "text": "Every tile prompt this run produced, in order, plus the scene summary the\nwhole picture produced.\n\nThey are also written to disk:\n\n```\nComfyUI/output/Smart-Upscaler/logs/\n```\n\n**This is the first place to look when something comes out wrong.** If tile 4\npainted a bush where there should be a wall, its prompt will say \"bush\" - and\nthen you know it is a reading problem, not a model problem.\n\nThe purple box to the left shows the **scene summary**: what the whole picture\nis, which large areas repeat across tiles, and what the main subject is."
+      },
       "color": "#432",
       "bgcolor": "#653"
     },
@@ -2599,11 +2800,18 @@
       ],
       "title": "Prompt log - saved to disk",
       "properties": {
+        "cnr_id": "comfyui-smart-upscaler",
+        "ver": "748414eb1db7d82c495da08d503739416790ce2f",
         "Node name for S&R": "SmartTilePromptAuditLog"
       },
       "widgets_values": [
-        "tile-prompts"
+        "tile-prompts",
+        ""
       ],
+      "widgets_values_named": {
+        "log_label": "tile-prompts",
+        "prompt_audit_viewer": ""
+      },
       "color": "#233",
       "bgcolor": "#355"
     },
@@ -2661,6 +2869,9 @@
       "widgets_values": [
         "fine detailed image"
       ],
+      "widgets_values_named": {
+        "text": "fine detailed image"
+      },
       "color": "#232",
       "bgcolor": "#353"
     },
@@ -2694,6 +2905,9 @@
       "widgets_values": [
         "Your Own Generator"
       ],
+      "widgets_values_named": {
+        "Constant": "Your Own Generator"
+      },
       "color": "#2a363b",
       "bgcolor": "#3f5159"
     },
@@ -2729,6 +2943,9 @@
       "widgets_values": [
         "Z-Turbo"
       ],
+      "widgets_values_named": {
+        "Constant": "Z-Turbo"
+      },
       "color": "#2a363b",
       "bgcolor": "#3f5159"
     },
@@ -2753,6 +2970,9 @@
       "widgets_values": [
         "Only the selected generator actually runs - the others cost nothing.\n\nTo add one: build your model chain, end it with a `Set_` node, then drag a\nmatching `Get_` node into `generator_2` here. The dropdown renames itself\nfrom the group title."
       ],
+      "widgets_values_named": {
+        "text": "Only the selected generator actually runs - the others cost nothing.\n\nTo add one: build your model chain, end it with a `Set_` node, then drag a\nmatching `Get_` node into `generator_2` here. The dropdown renames itself\nfrom the group title."
+      },
       "color": "#223",
       "bgcolor": "#335"
     },
@@ -2788,6 +3008,9 @@
       "widgets_values": [
         "Tiled_Images_Out"
       ],
+      "widgets_values_named": {
+        "Constant": "Tiled_Images_Out"
+      },
       "color": "#2a363b",
       "bgcolor": "#3f5159"
     },
@@ -2823,6 +3046,9 @@
       "widgets_values": [
         "Tile_References_Out"
       ],
+      "widgets_values_named": {
+        "Constant": "Tile_References_Out"
+      },
       "color": "#232",
       "bgcolor": "#353"
     },
@@ -2866,8 +3092,7 @@
         "cnr_id": "comfy-core",
         "ver": "0.28.0",
         "Node name for S&R": "VAEEncode"
-      },
-      "widgets_values": []
+      }
     },
     {
       "id": 1278,
@@ -2911,8 +3136,7 @@
         "cnr_id": "comfy-core",
         "ver": "0.28.0",
         "Node name for S&R": "VAEDecode"
-      },
-      "widgets_values": []
+      }
     },
     {
       "id": 1276,
@@ -3029,7 +3253,16 @@
         "euler",
         "simple",
         1
-      ]
+      ],
+      "widgets_values_named": {
+        "seed": 700200055632470,
+        "control_after_generate": "randomize",
+        "steps": 20,
+        "cfg": 8,
+        "sampler_name": "euler",
+        "scheduler": "simple",
+        "denoise": 1
+      }
     },
     {
       "id": 1266,
@@ -3068,6 +3301,9 @@
       "widgets_values": [
         "Your Own Generator"
       ],
+      "widgets_values_named": {
+        "Constant": "Your Own Generator"
+      },
       "color": "#2a363b",
       "bgcolor": "#3f5159"
     },
@@ -3079,7 +3315,7 @@
         1335.8213953326842
       ],
       "size": [
-        213.00000610351563,
+        213.0064453125,
         58
       ],
       "flags": {},
@@ -3103,6 +3339,9 @@
       "widgets_values": [
         "Positive_Prompts_Out"
       ],
+      "widgets_values_named": {
+        "Constant": "Positive_Prompts_Out"
+      },
       "color": "#2a363b",
       "bgcolor": "#3f5159"
     },
@@ -3138,6 +3377,9 @@
       "widgets_values": [
         "Tile_Seeds"
       ],
+      "widgets_values_named": {
+        "Constant": "Tile_Seeds"
+      },
       "color": "#1b4669",
       "bgcolor": "#29699c"
     },
@@ -3173,6 +3415,9 @@
       "widgets_values": [
         "Tiled_Images_Out"
       ],
+      "widgets_values_named": {
+        "Constant": "Tiled_Images_Out"
+      },
       "color": "#2a363b",
       "bgcolor": "#3f5159"
     },
@@ -3286,16 +3531,6 @@
             "name": "analysis_max_side"
           },
           "link": null
-        },
-        {
-          "localized_name": "vision_model_id",
-          "name": "vision_model_id",
-          "shape": 7,
-          "type": "STRING",
-          "widget": {
-            "name": "vision_model_id"
-          },
-          "link": null
         }
       ],
       "outputs": [
@@ -3325,6 +3560,8 @@
       ],
       "title": "Whole-picture read (runs once)",
       "properties": {
+        "cnr_id": "comfyui-smart-upscaler",
+        "ver": "748414eb1db7d82c495da08d503739416790ce2f",
         "Node name for S&R": "SmartCachedTextGenerate"
       },
       "widgets_values": [
@@ -3335,7 +3572,16 @@
         "read_write",
         "qwen3vl_4b_fp8_master_scene_v22_uniform_surfaces_v13",
         1344
-      ]
+      ],
+      "widgets_values_named": {
+        "max_length": 1024,
+        "sampling_mode": "Managed by Prompt Director (recommended)",
+        "thinking": false,
+        "use_default_template": true,
+        "cache_mode": "read_write",
+        "cache_tag": "qwen3vl_4b_fp8_master_scene_v22_uniform_surfaces_v13",
+        "analysis_max_side": 1344
+      }
     },
     {
       "id": 965,
@@ -3358,6 +3604,9 @@
       "widgets_values": [
         "Leave `type` set to **krea2**.\n\nThat setting is what makes this loader able to SEE your picture. Any other setting loads a text-only model, and your tile prompts come back empty."
       ],
+      "widgets_values_named": {
+        "text": "Leave `type` set to **krea2**.\n\nThat setting is what makes this loader able to SEE your picture. Any other setting loads a text-only model, and your tile prompts come back empty."
+      },
       "color": "#432",
       "bgcolor": "#653"
     },
@@ -3411,15 +3660,33 @@
           {
             "name": "A",
             "selected": true,
-            "url": "/api/view?filename=rgthree.compare._temp_mpecj_00003_.png&type=temp&subfolder=&rand=0.5763956580232645"
+            "url": "/api/view?filename=rgthree.compare._temp_iqacx_00035_.png&type=temp&subfolder=&rand=0.2626004154605013"
           },
           {
             "name": "B",
             "selected": true,
-            "url": "/api/view?filename=rgthree.compare._temp_mpecj_00004_.png&type=temp&subfolder=&rand=0.1800668369568419"
+            "url": "/api/view?filename=rgthree.compare._temp_iqacx_00036_.png&type=temp&subfolder=&rand=0.6638430145777782"
           }
         ]
       ],
+      "widgets_values_named": {
+        "rgthree_comparer": {
+          "images": [
+            {
+              "name": "A",
+              "selected": true,
+              "url": "/api/view?filename=rgthree.compare._temp_iqacx_00035_.png&type=temp&subfolder=&rand=0.2626004154605013",
+              "img": {}
+            },
+            {
+              "name": "B",
+              "selected": true,
+              "url": "/api/view?filename=rgthree.compare._temp_iqacx_00036_.png&type=temp&subfolder=&rand=0.6638430145777782",
+              "img": {}
+            }
+          ]
+        }
+      },
       "color": "#223",
       "bgcolor": "#335"
     },
@@ -3432,7 +3699,7 @@
       ],
       "size": [
         760,
-        760
+        798
       ],
       "flags": {},
       "order": 67,
@@ -3466,11 +3733,16 @@
       "outputs": [],
       "title": "Tile Inspector - click a tile to see its prompt",
       "properties": {
+        "cnr_id": "comfyui-smart-upscaler",
+        "ver": "748414eb1db7d82c495da08d503739416790ce2f",
         "Node name for S&R": "SmartTileInspector"
       },
       "widgets_values": [
         ""
       ],
+      "widgets_values_named": {
+        "tile_inspector": ""
+      },
       "color": "#223",
       "bgcolor": "#335"
     },
@@ -3666,22 +3938,38 @@
       ],
       "title": "Tile Planner - how big, how many tiles",
       "properties": {
+        "cnr_id": "comfyui-smart-upscaler",
+        "ver": "748414eb1db7d82c495da08d503739416790ce2f",
         "Node name for S&R": "SmartUpscaledTilePlanner"
       },
       "widgets_values": [
         "Lanczos (sharp standard resize)",
         1024,
-        1536,
+        2048,
         32,
         16,
-        2,
-        64,
+        3,
+        128,
         1,
         "edge",
         "read_write",
         "auto",
         1600
-      ]
+      ],
+      "widgets_values_named": {
+        "upscale_method": "Lanczos (sharp standard resize)",
+        "min_tile_size": 1024,
+        "max_tile_size": 2048,
+        "overlap": 32,
+        "feather": 16,
+        "scale_factor": 3,
+        "divisible_by": 128,
+        "upscale_batch_size": 1,
+        "padding_mode": "edge",
+        "cache_mode": "read_write",
+        "cache_tag": "auto",
+        "preview_max_size": 1600
+      }
     },
     {
       "id": 1036,
@@ -3691,7 +3979,7 @@
         106.07864973488147
       ],
       "size": [
-        339.51666870117185,
+        339.15,
         98
       ],
       "flags": {},
@@ -3742,11 +4030,16 @@
       ],
       "title": "Generator switch - add more generators here",
       "properties": {
+        "cnr_id": "comfyui-smart-upscaler",
+        "ver": "748414eb1db7d82c495da08d503739416790ce2f",
         "Node name for S&R": "SmartModelEngineSwitch"
       },
       "widgets_values": [
         "1: Z-Turbo"
-      ]
+      ],
+      "widgets_values_named": {
+        "generator": "1: Z-Turbo"
+      }
     },
     {
       "id": 1194,
@@ -3757,7 +4050,7 @@
       ],
       "size": [
         305.6333374023437,
-        140
+        186
       ],
       "flags": {},
       "order": 52,
@@ -3802,6 +4095,26 @@
             "name": "strength"
           },
           "link": null
+        },
+        {
+          "localized_name": "start_percent",
+          "name": "start_percent",
+          "shape": 7,
+          "type": "FLOAT",
+          "widget": {
+            "name": "start_percent"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "end_percent",
+          "name": "end_percent",
+          "shape": 7,
+          "type": "FLOAT",
+          "widget": {
+            "name": "end_percent"
+          },
+          "link": null
         }
       ],
       "outputs": [
@@ -3814,6 +4127,7 @@
           ]
         }
       ],
+      "title": "Tile Controlnet Amount",
       "properties": {
         "cnr_id": "comfy-core",
         "ver": "0.3.76",
@@ -3827,9 +4141,15 @@
         "secondTabWidth": 65
       },
       "widgets_values": [
-        0.6
+        0.8,
+        0,
+        1
       ],
-      "title": "Tile Controlnet Amount"
+      "widgets_values_named": {
+        "strength": 0.8,
+        "start_percent": 0,
+        "end_percent": 1
+      }
     },
     {
       "id": 1,
@@ -3893,6 +4213,10 @@
         "Upscale_Test_Image.png",
         "image"
       ],
+      "widgets_values_named": {
+        "image": "Upscale_Test_Image.png",
+        "upload": "image"
+      },
       "color": "#2a363b",
       "bgcolor": "#3f5159"
     },
@@ -3977,6 +4301,16 @@
             "name": "tile_colors"
           },
           "link": null
+        },
+        {
+          "localized_name": "prompt_reuse",
+          "name": "prompt_reuse",
+          "shape": 7,
+          "type": "COMBO",
+          "widget": {
+            "name": "prompt_reuse"
+          },
+          "link": null
         }
       ],
       "outputs": [
@@ -4011,19 +4345,32 @@
       ],
       "title": "Prompt Director - the master prompt",
       "properties": {
+        "cnr_id": "comfyui-smart-upscaler",
+        "ver": "748414eb1db7d82c495da08d503739416790ce2f",
         "Node name for S&R": "SmartUnifiedPromptGuidance"
       },
       "widgets_values": [
-        "TASK: Upscale / Detailer\n\nRebuild this image at higher resolution with real, generated detail. Nothing moves and nothing is added:\nthe same content, colors, lighting, and layout come back, but every surface should return with true,\nbelievable texture instead of soft, enlarged pixels.\n\nDescribe each area for what it IS. Name the thing, the material it is made of, its visible color, and how\nthat surface looks close up - grain, weave, roughness, wetness, and how its edges catch the light. The new\ndetail is generated from that description, so be specific and literal about materials rather than general\nabout the scene.\n\nBlur is part of the photo: out-of-focus areas stay just as soft, and only what is already sharp gains\ndetail. Thin real details that cross blurred areas are content, not blur, however fine: name them and\nkeep every one. If something is too blurry or small to identify for certain,\ndescribe it as soft shapes and colors - never guess what it might be. Don't redesign anything or add\nobjects that aren't there.",
+        "TASK: Upscale / Detailer\n\nRebuild this image at higher resolution with real, generated detail. Nothing moves and nothing is added:\nthe same content, colors, lighting, and layout come back, but every surface should return with true,\nbelievable texture instead of soft, enlarged pixels.\n\nDescribe each area for what it IS. Name the thing, the material it is made of, its visible color, and how\nthat surface looks close up - grain, weave, roughness, wetness, and how its edges catch the light. The new\ndetail is generated from that description, so be specific and literal about materials rather than general\nabout the scene.\n\nBlur is part of the photo: out-of-focus areas stay just as soft, and only what is already sharp gains\ndetail. Thin real details that cross blurred areas are content, not blur, however fine: name them and\nkeep every one. If something is too blurry or small to identify for certain,\ndescribe it as soft shapes and colors - never guess what it might be. Don't redesign anything or add\nobjects that aren't there.\n\nText: read every piece of visible text you can actually make out - signs, shop names, labels, numbers,\nposters, licence plates - and quote it exactly, in double quotes, with where it sits and how it looks:\nthe sign above the door reads \"BAKERY\" in white capitals on green. Copy the spelling, capitals and language\nexactly as written. If letters are too small or blurry to read with certainty, call it \"unreadable text\"\nand give only its colour and position - never guess the words.",
         "",
         "",
         "natural photographic detail",
         "Adaptive by Tile (recommended)",
         "Plain description (SDXL, Flux, denoise)",
         "Off - change nothing (default)",
-        null,
+        "Off - read the picture fresh (default)",
         null
-      ]
+      ],
+      "widgets_values_named": {
+        "instructions": "TASK: Upscale / Detailer\n\nRebuild this image at higher resolution with real, generated detail. Nothing moves and nothing is added:\nthe same content, colors, lighting, and layout come back, but every surface should return with true,\nbelievable texture instead of soft, enlarged pixels.\n\nDescribe each area for what it IS. Name the thing, the material it is made of, its visible color, and how\nthat surface looks close up - grain, weave, roughness, wetness, and how its edges catch the light. The new\ndetail is generated from that description, so be specific and literal about materials rather than general\nabout the scene.\n\nBlur is part of the photo: out-of-focus areas stay just as soft, and only what is already sharp gains\ndetail. Thin real details that cross blurred areas are content, not blur, however fine: name them and\nkeep every one. If something is too blurry or small to identify for certain,\ndescribe it as soft shapes and colors - never guess what it might be. Don't redesign anything or add\nobjects that aren't there.\n\nText: read every piece of visible text you can actually make out - signs, shop names, labels, numbers,\nposters, licence plates - and quote it exactly, in double quotes, with where it sits and how it looks:\nthe sign above the door reads \"BAKERY\" in white capitals on green. Copy the spelling, capitals and language\nexactly as written. If letters are too small or blurry to read with certainty, call it \"unreadable text\"\nand give only its colour and position - never guess the words.",
+        "user_request": "",
+        "known_false_detections": "",
+        "prompt_suffix": "natural photographic detail",
+        "tile_detail": "Adaptive by Tile (recommended)",
+        "sampler_prompt_style": "Plain description (SDXL, Flux, denoise)",
+        "tile_colors": "Off - change nothing (default)",
+        "prompt_reuse": "Off - read the picture fresh (default)",
+        "Save My Preset to Disk": null
+      }
     },
     {
       "id": 1195,
@@ -4146,22 +4493,31 @@
         511607058306665,
         "randomize",
         8,
-        1.4,
+        1.5,
         "euler",
         "beta",
-        0.6
-      ]
+        0.55
+      ],
+      "widgets_values_named": {
+        "seed": 511607058306665,
+        "control_after_generate": "randomize",
+        "steps": 8,
+        "cfg": 1.5,
+        "sampler_name": "euler",
+        "scheduler": "beta",
+        "denoise": 0.55
+      }
     },
     {
       "id": 1064,
-      "type": "SmartTileFinalizer",
+      "type": "SmartTileStitchClean",
       "pos": [
-        1316.0679113021442,
-        279.92192939551785
+        1317.2102681278466,
+        312.47890877292264
       ],
       "size": [
-        533.6260380980382,
-        462.17411956779654
+        430,
+        200
       ],
       "flags": {},
       "order": 63,
@@ -4198,67 +4554,27 @@
           "link": 2763
         },
         {
-          "localized_name": "reference_mode",
-          "name": "reference_mode",
-          "type": "COMBO",
-          "widget": {
-            "name": "reference_mode"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "structure_preservation",
-          "name": "structure_preservation",
-          "type": "INT",
-          "widget": {
-            "name": "structure_preservation"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "detail_support",
-          "name": "detail_support",
-          "type": "COMBO",
-          "widget": {
-            "name": "detail_support"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "fallback_method",
-          "name": "fallback_method",
-          "type": "COMBO",
-          "widget": {
-            "name": "fallback_method"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "cross_tile_consistency",
-          "name": "cross_tile_consistency",
-          "type": "INT",
-          "widget": {
-            "name": "cross_tile_consistency"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "consistency_mode",
-          "name": "consistency_mode",
+          "localized_name": "prompt_system",
+          "name": "prompt_system",
           "shape": 7,
+          "type": "SMART_PROMPT_SYSTEM",
+          "link": null
+        },
+        {
+          "localized_name": "colors",
+          "name": "colors",
           "type": "COMBO",
           "widget": {
-            "name": "consistency_mode"
+            "name": "colors"
           },
           "link": null
         },
         {
-          "localized_name": "finish_preset",
-          "name": "finish_preset",
-          "shape": 7,
+          "localized_name": "joins",
+          "name": "joins",
           "type": "COMBO",
           "widget": {
-            "name": "finish_preset"
+            "name": "joins"
           },
           "link": null
         }
@@ -4285,17 +4601,18 @@
       ],
       "title": "Stitch the tiles back into one picture",
       "properties": {
-        "Node name for S&R": "SmartTileFinalizer"
+        "cnr_id": "comfyui-smart-upscaler",
+        "ver": "748414eb1db7d82c495da08d503739416790ce2f",
+        "Node name for S&R": "SmartTileStitchClean"
       },
       "widgets_values": [
-        "Stay close to the original photo",
-        50,
-        "Keep more new detail",
-        "bilinear",
-        60,
-        "Fade the fix toward the edge that disagrees (best for seams)",
-        "Photo upscale, seams hidden (start here)"
+        "Leave the tiles exactly as drawn",
+        "Soft - fade across the overlap (recommended)"
       ],
+      "widgets_values_named": {
+        "colors": "Leave the tiles exactly as drawn",
+        "joins": "Soft - fade across the overlap (recommended)"
+      },
       "color": "#232",
       "bgcolor": "#353"
     }
@@ -4324,14 +4641,6 @@
       1039,
       1,
       "IMAGE"
-    ],
-    [
-      2502,
-      2,
-      0,
-      1061,
-      0,
-      "CLIP"
     ],
     [
       2509,
@@ -4614,27 +4923,11 @@
       "IMAGE"
     ],
     [
-      2774,
-      1218,
-      1,
-      1061,
-      2,
-      "STRING"
-    ],
-    [
       2775,
       1218,
       1,
       1062,
       0,
-      "STRING"
-    ],
-    [
-      2776,
-      1218,
-      2,
-      1061,
-      3,
       "STRING"
     ],
     [
@@ -4644,30 +4937,6 @@
       800,
       0,
       "INT"
-    ],
-    [
-      2780,
-      1218,
-      4,
-      1061,
-      1,
-      "IMAGE"
-    ],
-    [
-      2781,
-      2,
-      0,
-      1219,
-      0,
-      "CLIP"
-    ],
-    [
-      2782,
-      1217,
-      2,
-      1219,
-      1,
-      "IMAGE"
     ],
     [
       2785,
@@ -4740,14 +5009,6 @@
       1221,
       3,
       "STRING"
-    ],
-    [
-      2835,
-      1212,
-      0,
-      1036,
-      1,
-      "IMAGE"
     ],
     [
       2836,
@@ -4870,22 +5131,6 @@
       "STRING"
     ],
     [
-      2853,
-      1246,
-      0,
-      1219,
-      2,
-      "STRING"
-    ],
-    [
-      2854,
-      1246,
-      1,
-      1061,
-      4,
-      "SMART_PROMPT_SYSTEM"
-    ],
-    [
       2855,
       1246,
       1,
@@ -4899,14 +5144,6 @@
       1,
       1218,
       3,
-      "SMART_PROMPT_SYSTEM"
-    ],
-    [
-      2857,
-      1246,
-      1,
-      1219,
-      4,
       "SMART_PROMPT_SYSTEM"
     ],
     [
@@ -4947,6 +5184,86 @@
       0,
       1266,
       0,
+      "IMAGE"
+    ],
+    [
+      2502,
+      2,
+      0,
+      1061,
+      0,
+      "CLIP"
+    ],
+    [
+      2780,
+      1218,
+      4,
+      1061,
+      1,
+      "IMAGE"
+    ],
+    [
+      2774,
+      1218,
+      1,
+      1061,
+      2,
+      "STRING"
+    ],
+    [
+      2776,
+      1218,
+      2,
+      1061,
+      3,
+      "STRING"
+    ],
+    [
+      2854,
+      1246,
+      1,
+      1061,
+      4,
+      "SMART_PROMPT_SYSTEM"
+    ],
+    [
+      2781,
+      2,
+      0,
+      1219,
+      0,
+      "CLIP"
+    ],
+    [
+      2782,
+      1217,
+      2,
+      1219,
+      1,
+      "IMAGE"
+    ],
+    [
+      2853,
+      1246,
+      0,
+      1219,
+      2,
+      "STRING"
+    ],
+    [
+      2857,
+      1246,
+      1,
+      1219,
+      4,
+      "SMART_PROMPT_SYSTEM"
+    ],
+    [
+      2835,
+      1212,
+      0,
+      1036,
+      1,
       "IMAGE"
     ]
   ],
@@ -5040,10 +5357,10 @@
   "extra": {
     "workflowRendererVersion": "LG",
     "ds": {
-      "scale": 0.45,
+      "scale": 0.9229599817706429,
       "offset": [
-        1206.0079585377252,
-        892.3243441539171
+        1686.8880187718887,
+        656.6657646852561
       ]
     },
     "frontendVersion": "1.45.21",
@@ -5054,11 +5371,23 @@
     "anomalous_hashes": {
       "1199_ae.safetensors": {
         "hash": "",
-        "size": 335304388
+        "size": 335304388,
+        "url": ""
+      },
+      "2_qwen3vl_4b_fp8_scaled.safetensors": {
+        "hash": "",
+        "size": 5242467968,
+        "url": ""
+      },
+      "1201_qwen_3_4b.safetensors": {
+        "hash": "",
+        "size": 8044982048,
+        "url": ""
       },
       "1205_z_image_turbo_nvfp4.safetensors": {
         "hash": "",
-        "size": 4509509600
+        "size": 4509509600,
+        "url": ""
       }
     }
   },

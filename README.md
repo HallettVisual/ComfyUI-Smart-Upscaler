@@ -37,10 +37,10 @@ takes an image and a prompt and returns an image can sit there.
 
 1. Put this folder in `ComfyUI/custom_nodes/ComfyUI-Smart-Upscaler`
 2. From ComfyUI Manager, install **ComfyUI-KJNodes** and **rgthree-comfy**
-3. Download the models listed in **[docs/MODELS.md](docs/MODELS.md)** — about 13 GB
+3. Download the models listed in **[docs/MODELS.md](docs/MODELS.md)** — about 18 GB
 4. Copy `workflow/Upscale_Test_Image.png` into your `ComfyUI/input/` folder
 5. Restart ComfyUI
-6. Load `workflow/Smart-Upscaler-Z-Turbo-v2.json`
+6. Load `workflow/Smart-Upscaler-Z-Turbo-v3.json`
 
 No Python dependencies beyond ComfyUI itself.
 
@@ -145,7 +145,8 @@ three it isn't using.
 | Exact-Tile Prompt | Writes one prompt per tile. Cached. |
 | Sampler Tile Test Selector | Optional. Render one tile to try a setting. |
 | Color Match to Original | Optional. Pulls tiles back toward the source colours. |
-| Stitch Tiles Into One Picture | Puts it back together and hides the joins. |
+| Stitch Tiles - Clean | Puts the tiles back together and fades the joins. Used by the included workflow. |
+| Stitch Tiles Into One Picture | The older stitcher, with structure and colour correction dials. |
 | Tile Prompt Inspector | Click a tile, see its prompt. |
 | All Prompts Viewer + Log | Every prompt, on screen and on disk. |
 | Generator Switch | Only the selected model chain runs. |
@@ -217,15 +218,18 @@ usually costs **no extra tiles** — the planner just makes each tile slightly
 larger. Check the preflight box before and after.
 
 If one tile is visibly a different shade from its neighbours, set the stitcher's
-`consistency_mode` to **Smooth gradient**. It corrects the drifting tile without
-dragging correct neighbours with it.
+**colors** to *Keep the new look, even out the tiles*.
+
+If a texture (a knit scarf, a brick wall) changes from one tile to the next, the
+Tile ControlNet is too weak: use the full 6.7 GB model at strength 0.8 or higher.
 
 ---
 
 ## The included workflow
 
-`workflow/Smart-Upscaler-Z-Turbo-v2.json` — Z-Image Turbo with a Tile
-ControlNet. It runs as downloaded.
+`workflow/Smart-Upscaler-Z-Turbo-v3.json` — Z-Image Turbo with the full Tile
+ControlNet at 0.8, the Clean stitcher, and instructions that copy any readable
+text into the tile prompts. It runs as downloaded.
 
 The optional ESRGAN enlarger ships **unwired on purpose**. Out of the box the
 planner uses Lanczos, which needs no download — and a loader pointing at a model

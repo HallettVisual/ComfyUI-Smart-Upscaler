@@ -44,7 +44,7 @@ class SmartUpscalerPipelineTests(unittest.TestCase):
         workflow_path = (
             Path(__file__).resolve().parents[1]
             / "workflow"
-            / "Smart-Upscaler-Z-Turbo-v2.json"
+            / "Smart-Upscaler-Z-Turbo-v3.json"
         )
         workflow = json.loads(workflow_path.read_text(encoding="utf-8"))
         smart_types = {
@@ -55,10 +55,10 @@ class SmartUpscalerPipelineTests(unittest.TestCase):
 
         # The shipped workflow exercises every registered node, so a node that
         # stops being wired in is a real regression rather than a stale test.
-        # Stitch Tiles - Clean is on trial beside the old stitcher until it
-        # replaces it.
-        on_trial = {"SmartTileStitchClean"}
-        self.assertEqual(smart_types | on_trial, set(node_registry.NODE_CLASS_MAPPINGS))
+        # The workflow uses Stitch Tiles - Clean; the older stitcher stays
+        # registered for saved graphs that still use it.
+        kept_for_old_graphs = {"SmartTileFinalizer"}
+        self.assertEqual(smart_types | kept_for_old_graphs, set(node_registry.NODE_CLASS_MAPPINGS))
         self.assertEqual(
             set(node_registry.NODE_CLASS_MAPPINGS),
             set(node_registry.NODE_DISPLAY_NAME_MAPPINGS),

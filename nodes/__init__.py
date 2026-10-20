@@ -38,7 +38,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "SmartSamplerTileSelector": "Sampler Tile Test Selector (Optional)",
     "SmartTileColorMatch": "Color Match to Original (Optional)",
     "SmartTileFinalizer": "Stitch Tiles Into One Picture",
-    "SmartTileStitchClean": "Stitch Tiles - Clean (test)",
+    "SmartTileStitchClean": "Stitch Tiles - Clean",
     "SmartTileInspector": "Smart Tile Prompt Inspector",
     "SmartTilePromptAuditLog": "All Prompts Viewer + Log",
     "SmartModelEngineSwitch": "Generator Switch (only selected runs)",

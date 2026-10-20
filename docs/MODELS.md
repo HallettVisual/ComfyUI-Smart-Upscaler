@@ -1,7 +1,7 @@
 # Model downloads
 
 Everything here is free. Put each file in the folder shown, then restart
-ComfyUI. About **13 GB** in total.
+ComfyUI. About **18 GB** in total.
 
 This same list is also printed inside the workflow itself, in the note titled
 **MODEL DOWNLOADS — read this first**.
@@ -67,14 +67,18 @@ conditioning.
 
 ---
 
-## 3. Tile ControlNet — holds your layout steady
+## 3. Tile ControlNet — holds your layout and textures steady
 
 `ComfyUI/models/model_patches/`
 
-The workflow is set to the **Tile** model from Alibaba's Z-Image-Turbo-Fun
-ControlNet family. Find it on the
-[alibaba-pai Hugging Face page](https://huggingface.co/alibaba-pai) — look for
-`Z-Image-Turbo-Fun-Controlnet-Tile`.
+| File | Size |
+|---|---|
+| [Z-Image-Turbo-Fun-Controlnet-Tile-2.1-2601-8steps.safetensors](https://huggingface.co/alibaba-pai/Z-Image-Turbo-Fun-Controlnet-Union-2.1/resolve/main/Z-Image-Turbo-Fun-Controlnet-Tile-2.1-2601-8steps.safetensors) | 6.7 GB |
+
+The workflow uses this full model at strength 0.8. It keeps surfaces such as knit,
+brick and fabric the same in every tile. The 2 GB `-lite-` version in the same
+repository also works if space is tight, but its weaker hold lets textures change
+from one tile to the next.
 
 The **Union** model works too. If that is what you have, just select it in the
 `ModelPatchLoader` node:
@@ -110,7 +114,7 @@ ComfyUI/
     ├── vae/
     │   └── ae.safetensors
     ├── model_patches/
-    │   └── Z-Image-Turbo-Fun-Controlnet-Tile-*.safetensors
+    │   └── Z-Image-Turbo-Fun-Controlnet-Tile-2.1-2601-8steps.safetensors
     └── upscale_models/
         └── (optional 4x model)
 ```
@@ -137,14 +141,15 @@ finishes all its work, and unloads before the next one starts:
 ```
 vision model (4.9 GB) → reads the picture, writes every tile prompt → unloaded
 text encoder (7.5 GB) → encodes every prompt                        → unloaded
-Z-Image + ControlNet (≈6 GB) → renders every tile
+Z-Image + Tile ControlNet (≈11 GB) → renders every tile
 ```
 
-One model swap per stage, not per tile. Sampler tiles are 1024–1536 px, so the
+One model swap per stage, not per tile. Sampler tiles are 1024–2048 px, so the
 working memory is small — it is the model weights that dominate.
 
 If you are tight on memory:
 
 - use the **int8** diffusion model instead of bf16
+- use the 2 GB **lite** Tile ControlNet
 - lower **Prompt Detail Level** on the Prompt Director
 - lower **max_tile_size** in the Tile Planner
