@@ -1,6 +1,27 @@
 # Changelog
 
-## Unreleased
+## 1.3.1 — 2026-10-20
+
+**New included workflow: Smart-Upscaler-Z-Turbo-v3**
+
+- Uses the full Z-Image Tile ControlNet 2.1 (2601) at strength 0.8 instead of
+  the lite model at 0.6. Textures such as a knit scarf now stay the same in every
+  tile instead of changing at the tile borders (source match 0.81 -> 0.87 on the
+  test portrait). It is a 6.7 GB download; see docs/MODELS.md.
+- Uses Stitch Tiles - Clean, which no longer carries "(test)" in its name.
+- The instructions now copy any readable text (signs, labels, numbers) into the
+  tile prompts word for word, and never guess unreadable text.
+- Replaces Smart-Upscaler-Z-Turbo-v2.
+
+**Tile prompts about 9x faster**
+
+- On ComfyUI 0.42.0 and newer, the prompt nodes use ComfyUI's CUDA graph decode
+  again: Qwen3-VL 4B writes tile prompts at 150+ tokens/s instead of 13-16 on an
+  RTX 5090. ComfyUI 0.42.0 fixed the cleanup crash that 1.3.0 worked around;
+  older ComfyUI keeps the 1.3.0 behaviour.
+- Choosing a generator whose group is bypassed now says so and tells you to
+  press Ctrl+B, instead of ComfyUI's "needs input generator_2, but there is no
+  input to that node at all".
 
 **Live prompt readout**
 

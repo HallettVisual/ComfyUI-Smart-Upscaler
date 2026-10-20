@@ -67,6 +67,20 @@ class GeneratorSwitchNodeTests(unittest.TestCase):
         self.assertIn("generator 4", str(caught.exception))
         self.assertIn("1, 3", str(caught.exception))
 
+    def test_a_bypassed_generator_is_explained_not_requested(self):
+        """A bypassed group leaves its slot unconnected: the key is absent.
+
+        Requesting it made ComfyUI fail with "needs input generator_2, but
+        there is no input". The switch must skip it and route() must say why,
+        listing the generators that are connected but were never evaluated.
+        """
+        node = SmartModelEngineSwitch()
+        self.assertEqual(node.check_lazy_status("2: SeedVR2 restore", generator_1=None), [])
+        with self.assertRaises(ValueError) as caught:
+            node.route("2: SeedVR2 restore", generator_1=None)
+        self.assertIn("connected generators: 1", str(caught.exception))
+        self.assertIn("Ctrl+B", str(caught.exception))
+
     def test_sockets_named_before_the_rename_still_route(self):
         """API-format prompts and un-migrated graphs send engine_N.
 
