@@ -19,6 +19,15 @@ except ImportError:  # the unit tests run without ComfyUI
     _comfy_args = None
 
 try:
+    from comfyui_version import __version__ as _comfy_version
+except ImportError:
+    _comfy_version = "0"
+# ComfyUI 0.42.0 fixed text generation not cleaning itself up (#17169), the
+# crash that made caption decoding skip CUDA graphs. Decoding is ~9x faster with
+# them (Qwen3-VL 4B on an RTX 5090: 13 -> 120+ tokens/s).
+_CUDA_GRAPH_DECODE_SAFE = tuple(int(p) for p in re.findall(r"\d+", _comfy_version)[:3]) >= (0, 42, 0)
+
+try:
     from server import PromptServer
 except ImportError:  # the unit tests run without ComfyUI's server
     PromptServer = None
@@ -209,14 +218,14 @@ _EXPECTED_OBJECT_MIN_OVERLAP = 0.12
 
 @contextlib.contextmanager
 def _plain_decode():
-    """Generate captions without ComfyUI's recorded-allocation (CUDA graph) path.
+    """On ComfyUI before 0.42.0, generate captions without the CUDA graph path.
 
     Since ComfyUI's Qwen3 cudagraph decode (Sept 2026), cleaning up that recording
     after the node hard-crashed ComfyUI for several users - fixed only by
-    launching with --disable-comfy-compiler. Caption decoding measured no faster
-    with it, so it is switched off for exactly these calls and restored after.
+    launching with --disable-comfy-compiler - until 0.42.0 fixed the cleanup.
+    On older versions it is switched off for exactly these calls and restored after.
     """
-    if _comfy_args is None:
+    if _comfy_args is None or _CUDA_GRAPH_DECODE_SAFE:
         yield
         return
     saved = (_comfy_args.disable_comfy_compiler, _comfy_args.disable_cuda_graphs)
