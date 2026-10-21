@@ -1313,9 +1313,20 @@ def _select_canonical_object(reference, payload):
 
     requested_id = str(payload.get("object_id", "")).strip().casefold()
     if requested_id:
+        # The id must agree with the tile's own description. A coffee-table
+        # tile returned object_id "window" and copied the window's prompt into
+        # object_prompt while describing only the table, and got "large window".
+        own_words = _object_text_tokens(
+            " ".join(
+                str(payload.get(key, ""))
+                for key in ("local_caption", "dominant_region", "local_features", "target_prompt")
+            )
+        )
         for candidate in candidates:
             if str(candidate.get("id", "")).strip().casefold() == requested_id:
-                return candidate
+                if _object_candidate_tokens(candidate) & own_words:
+                    return candidate
+                break
 
     # The tile was asked about both a surface and an object and answered both:
     # surface yes, object no. That is a statement about these pixels, not a

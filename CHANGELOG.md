@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.3.2 — 2026-10-21
+
+**Tile prompts no longer swap a correct reading for a wrong guess**
+
+- When the whole-image read placed an object in a tile (a fireplace in the top
+  window tile) and the model correctly did not see it there, the tile's caption
+  was thrown away and replaced with a guess that included that object and its
+  materials. After one retry the model's own reading is now kept. This was the
+  cause of every "NEEDS ATTENTION" tile in recent logs.
+- A tile that tags an object without describing it (a coffee-table tile tagged
+  "window") no longer gets that object added to its prompt.
+
 ## 1.3.1 — 2026-10-20
 
 **New included workflow: Smart-Upscaler-Z-Turbo-v3**

@@ -425,6 +425,31 @@ class PromptRecoveryTests(unittest.TestCase):
         self.assertIn("modern wooden cabin", problem)
         self.assertNotIn('candidate "building"', problem)
 
+    def test_object_id_without_matching_description_is_not_applied(self):
+        reference = {
+            "evidence_class": "structured",
+            "canonical_objects": [
+                {
+                    "id": "window",
+                    "identity": "window",
+                    "target_prompt": "large floor-to-ceiling window with black frame",
+                    "spatial_overlap": 1.0,
+                    "part_in_this_tile": "large window",
+                }
+            ],
+        }
+        table = {
+            "local_caption": "black coffee table with books on a patterned rug",
+            "dominant_region": "coffee table",
+            "surface_id": "wood_floor",
+            "object_id": "window",
+            "object_prompt": "large floor-to-ceiling window with black frame",
+            "target_prompt": "black coffee table with books on a patterned rug",
+        }
+        self.assertIsNone(_select_canonical_object(reference, table))
+        window = dict(table, local_caption="window frame and clear glass")
+        self.assertEqual(_select_canonical_object(reference, window)["id"], "window")
+
     def test_wholly_generic_object_is_not_a_hard_tile_blocker(self):
         reference = json.dumps(
             {
@@ -627,11 +652,11 @@ class PromptRecoveryTests(unittest.TestCase):
                     "unconfirmed-cabin-does-not-abort",
                     "artifacts, seams",
                 )
-                # A guessed prompt is never cached, so the next run asks again.
-                self.assertEqual(list(Path(cache_directory).rglob("*.json")), [])
-        self.assertEqual(model.calls, 3)
-        self.assertIn("CONSERVATIVE-FALLBACK", result[4])
-        self.assertIn("NOT SAVED", result[4])
+        # Asked twice, the model's own reading of the pixels wins over the
+        # brief's location guess, and it is a real reading, so it is cached.
+        self.assertEqual(model.calls, 2)
+        self.assertIn("RETRY WRITE", result[4])
+        self.assertIn("calm water", result[0].casefold())
         self.assertNotIn("cabin", result[0].casefold())
         self.assertNotIn("building", result[0].casefold())
 

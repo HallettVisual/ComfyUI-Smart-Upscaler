@@ -2137,6 +2137,12 @@ class SmartCachedTilePromptGenerator:
                 )
                 retried = True
                 problem = self._caption_problem(caption, tile_reference, prompt_system)
+            if problem.startswith("structured tile omitted location-matched object candidate"):
+                # Every other check passed and the model still does not see the
+                # brief's candidate after being asked twice. The brief's locations
+                # are a coarse guess; recovering from here replaced a correct
+                # window-tile reading with the fireplace and stone it had rejected.
+                problem = ""
             if problem == "missing local_caption":
                 caption = _apply_missing_local_caption_guard(caption)
                 schema_guarded = True
