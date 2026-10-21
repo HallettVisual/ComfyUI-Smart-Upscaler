@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+import re
 import uuid
 
 import numpy as np
@@ -29,7 +30,9 @@ def _first(values, default=None):
 def _save_inspector_image(image, directory, prefix):
     if not isinstance(image, torch.Tensor) or image.ndim != 4 or image.shape[0] != 1:
         raise ValueError("Each inspector image must contain exactly one ComfyUI image.")
-    filename = f"{prefix}_{uuid.uuid4().hex[:12]}.png"
+    # The prefix carries the node id and tile id, both free text in an API prompt;
+    # "../" in either must not leave the temp folder.
+    filename = f"{re.sub(r'[^A-Za-z0-9_-]+', '_', prefix)}_{uuid.uuid4().hex[:12]}.png"
     image_array = (
         image[0, ..., :3].detach().float().clamp(0.0, 1.0).cpu().numpy() * 255.0
     ).round().astype(np.uint8)

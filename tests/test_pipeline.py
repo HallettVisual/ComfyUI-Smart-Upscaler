@@ -1,5 +1,4 @@
 import json
-import os
 from pathlib import Path
 import tempfile
 import types
@@ -1575,13 +1574,7 @@ EXACT-TILE PASS: Use only exact-tile evidence and spatially matching master cont
             stale = esrgan_directory / ".failed-write.tmp"
             stale.write_bytes(b"partial")
             disk_usage = types.SimpleNamespace(total=1024, used=1024, free=0)
-            with patch.dict(
-                os.environ,
-                {
-                    "SMART_UPSCALER_ESRGAN_CACHE_MAX_GB": "12",
-                    "SMART_UPSCALER_CACHE_FREE_RESERVE_GB": "2",
-                },
-            ), patch(
+            with patch(
                 "nodes.cache._cache_root", return_value=Path(cache_directory)
             ), patch("nodes.cache.shutil.disk_usage", return_value=disk_usage):
                 path, reason = save_esrgan_tiles("low-space", tiles)
@@ -1589,6 +1582,18 @@ EXACT-TILE PASS: Use only exact-tile evidence and spatially matching master cont
         self.assertIsNone(path)
         self.assertIn("insufficient disk space", reason)
         self.assertFalse(stale.exists())
+
+    def test_inspector_image_names_stay_in_their_folder(self):
+        from nodes.review import _save_inspector_image
+
+        with tempfile.TemporaryDirectory() as directory:
+            record = _save_inspector_image(
+                torch.rand((1, 4, 4, 3)), Path(directory), "tile_review_../../escape_T001_source"
+            )
+            self.assertEqual(
+                list(Path(directory).iterdir()), [Path(directory) / record["filename"]]
+            )
+        self.assertNotIn("..", record["filename"])
 
     def test_standard_resize_upscaling_needs_no_ai_model(self):
         image = torch.rand((1, 4, 6, 3), dtype=torch.float32)

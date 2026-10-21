@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.3.4 — 2026-10-21
+
+**Installable from the Comfy Registry again**
+
+- Every release since 1.2.0 was flagged by the Registry's security scan and
+  could not be installed from it. The scan flagged the cache size limits being
+  read from environment variables. They are now fixed values with the same
+  defaults: 2 GB for upscaled tiles, 2 GB of free disk kept in reserve, and
+  256 MB / 30 days for prompts.
+- The Tile Inspector's preview file names can no longer contain path
+  characters, so a node or tile id sent through the API cannot place a file
+  outside ComfyUI's temp folder.
+
 ## 1.3.3 — 2026-10-21
 
 **Prompt reuse works on a second pass**

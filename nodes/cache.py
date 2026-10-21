@@ -1,7 +1,6 @@
 import contextlib
 import hashlib
 import json
-import os
 from pathlib import Path
 import re
 import shutil
@@ -596,14 +595,6 @@ def _cache_root():
     return root
 
 
-def _positive_gigabytes_from_env(name, default):
-    try:
-        value = float(os.environ.get(name, default))
-    except (TypeError, ValueError):
-        value = float(default)
-    return max(0.0, value)
-
-
 def _remove_file_quietly(path):
     try:
         Path(path).unlink(missing_ok=True)
@@ -620,18 +611,8 @@ def _prepare_esrgan_cache_space(directory, required_bytes):
     for temporary in directory.glob("*.tmp"):
         _remove_file_quietly(temporary)
 
-    max_bytes = int(
-        _positive_gigabytes_from_env(
-            "SMART_UPSCALER_ESRGAN_CACHE_MAX_GB", DEFAULT_ESRGAN_CACHE_MAX_GB
-        )
-        * 1024**3
-    )
-    reserve_bytes = int(
-        _positive_gigabytes_from_env(
-            "SMART_UPSCALER_CACHE_FREE_RESERVE_GB", DEFAULT_CACHE_FREE_RESERVE_GB
-        )
-        * 1024**3
-    )
+    max_bytes = int(DEFAULT_ESRGAN_CACHE_MAX_GB * 1024**3)
+    reserve_bytes = int(DEFAULT_CACHE_FREE_RESERVE_GB * 1024**3)
     entries = []
     total_bytes = 0
     for path in directory.glob("*.pt"):
@@ -825,22 +806,12 @@ def _read_prompt(cache_key):
 def _prune_prompt_cache(directory):
     """Keep the prompt cache small and self-cleaning.
 
-    Entries older than SMART_UPSCALER_PROMPT_CACHE_MAX_AGE_DAYS are removed, and
-    the newest entries are kept within SMART_UPSCALER_PROMPT_CACHE_MAX_MB. Runs
-    on every write, so the cache can never silently grow without bound.
+    Entries older than DEFAULT_PROMPT_CACHE_MAX_AGE_DAYS are removed, and the
+    newest entries are kept within DEFAULT_PROMPT_CACHE_MAX_MB. Runs on every
+    write, so the cache can never silently grow without bound.
     """
-    max_bytes = int(
-        _positive_gigabytes_from_env(
-            "SMART_UPSCALER_PROMPT_CACHE_MAX_MB", DEFAULT_PROMPT_CACHE_MAX_MB
-        )
-        * 1024**2
-    )
-    max_age_seconds = (
-        _positive_gigabytes_from_env(
-            "SMART_UPSCALER_PROMPT_CACHE_MAX_AGE_DAYS", DEFAULT_PROMPT_CACHE_MAX_AGE_DAYS
-        )
-        * 86400.0
-    )
+    max_bytes = int(DEFAULT_PROMPT_CACHE_MAX_MB * 1024**2)
+    max_age_seconds = DEFAULT_PROMPT_CACHE_MAX_AGE_DAYS * 86400.0
     now = datetime.now(timezone.utc).timestamp()
     entries = []
     for path in Path(directory).glob("*.json"):
