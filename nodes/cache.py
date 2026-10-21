@@ -883,9 +883,10 @@ def _write_prompt(cache_key, text, cache_tag):
     return path, ""
 
 
-# Reuse matches an edited copy of a picture already run: same size, and a 16x16
-# thumbnail within this mean difference (0-1 scale). Retouching, re-saving and
-# small fixes stay well under it; a different photo lands far above it.
+# Reuse matches an edited copy of a picture already run, or its upscaled result
+# fed back in for another pass: same shape, and a 16x16 thumbnail within this
+# mean difference (0-1 scale). Retouching, re-saving, small fixes and upscaling
+# stay well under it; a different photo lands far above it.
 _REUSE_MAX_DIFFERENCE = 0.06
 _REUSE_RECORDS_PER_SLOT = 8
 
@@ -1368,7 +1369,7 @@ class SmartCachedTextGenerate:
             analysis_max_side,
         )
         if cache_mode == "read_write":
-            reuse_slot = _reuse_slot("brief", [list(image.shape[1:3]), prompt, context, cache_tag])
+            reuse_slot = _reuse_slot("brief", [round(image.shape[2] / image.shape[1], 2), prompt, context, cache_tag])
             prompt, measured = self._measured_augmentation(image, prompt, prompt_system)
             vision_image = _analysis_image(image, analysis_max_side)
             cache_key = _prompt_cache_key(vision_image, prompt, context, cache_tag)
@@ -1397,7 +1398,7 @@ class SmartCachedTextGenerate:
             max_length, sampling_mode, thinking, use_default_template, key_context,
             analysis_max_side,
         )
-        reuse_slot = _reuse_slot("brief", [list(image.shape[1:3]), prompt, context, cache_tag])
+        reuse_slot = _reuse_slot("brief", [round(image.shape[2] / image.shape[1], 2), prompt, context, cache_tag])
         prompt, measured = self._measured_augmentation(image, prompt, prompt_system)
         vision_image = _analysis_image(image, analysis_max_side)
         cache_key = _prompt_cache_key(vision_image, prompt, context, cache_tag)
@@ -1789,7 +1790,9 @@ class SmartCachedTilePromptGenerator:
         return str(prompt_system.get("composition_mode", "")) == "task_directed"
 
     def _caption_problem(self, caption, tile_reference, prompt_system):
-        problem = _source_caption_problem(
+        # An omitted expected object is not a problem with the caption: it only
+        # earns a fresh caption one focused retry, in generate().
+        return _source_caption_problem(
             caption,
             self._evidence_class(tile_reference),
             self._requires_target(prompt_system),
@@ -1797,9 +1800,6 @@ class SmartCachedTilePromptGenerator:
             self._visual_complexity(tile_reference),
             str(prompt_system.get("task_preset", "")) == "Google Image Enhance",
         )
-        if problem:
-            return problem
-        return _expected_object_problem(caption, tile_reference)
 
     @staticmethod
     def _run_caption(clip, image, prompt, caption_generation, max_length=256):
@@ -1980,7 +1980,9 @@ class SmartCachedTilePromptGenerator:
             caption = self._run_caption(
                 clip, image, instruction, caption_generation, caption_tokens
             )
-            problem = self._caption_problem(caption, tile_reference, prompt_system)
+            problem = self._caption_problem(
+                caption, tile_reference, prompt_system
+            ) or _expected_object_problem(caption, tile_reference)
             retried = False
             false_detection_guarded = False
             schema_guarded = False
@@ -2137,12 +2139,6 @@ class SmartCachedTilePromptGenerator:
                 )
                 retried = True
                 problem = self._caption_problem(caption, tile_reference, prompt_system)
-            if problem.startswith("structured tile omitted location-matched object candidate"):
-                # Every other check passed and the model still does not see the
-                # brief's candidate after being asked twice. The brief's locations
-                # are a coarse guess; recovering from here replaced a correct
-                # window-tile reading with the fireplace and stone it had rejected.
-                problem = ""
             if problem == "missing local_caption":
                 caption = _apply_missing_local_caption_guard(caption)
                 schema_guarded = True

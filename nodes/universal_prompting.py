@@ -253,8 +253,8 @@ _TILE_COLOR_LEGACY_OFF = "automatic (follow the preset instructions)"
 _TILE_COLOR_LEGACY_ON = "no color words (keep original colors)"
 
 
-# Reuse is for an edited copy of the SAME picture at the same size: the saved
-# prompts are used again instead of reading the picture fresh. Anything
+# Reuse is for an edited copy of the SAME picture, or its upscaled result run
+# again: the saved prompts are used again instead of reading the picture fresh. Anything
 # unrecognised - including the empty slot an older saved graph carries - is Off.
 PROMPT_REUSE_CHOICES = (
     "Off - read the picture fresh (default)",

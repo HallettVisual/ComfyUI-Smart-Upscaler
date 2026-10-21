@@ -135,9 +135,54 @@ class PromptReuseTests(TileArguments, unittest.TestCase):
                     [],
                 )
                 reused = node.generate(None, edited, *settings, prompt_system=system)
+                # The 4x result loaded back in for a 1:1 pass is the same picture.
+                finished = torch.nn.functional.interpolate(
+                    edited.movedim(-1, 1), scale_factor=4, mode="bilinear"
+                ).movedim(1, -1)
+                self.assertEqual(
+                    node.check_lazy_status(None, finished, *settings, prompt_system=system),
+                    [],
+                )
         self.assertEqual(model.calls, 1)
         self.assertEqual(reused[0], first[0])
         self.assertIn("REUSED", reused[1])
+
+    def test_a_tile_that_rejected_an_expected_object_is_saved_and_reused(self):
+        """A tile that, asked twice, does not see the brief's object keeps its reading.
+
+        That reading was saved but failed the object check on every later
+        read, so it was captioned again on each rerun and never reused.
+        """
+        model = CountingModel(TILE_CAPTION)
+        node = SmartCachedTilePromptGenerator()
+
+        def arguments(image):
+            values = list(self._tile_arguments(image, True))
+            reference = json.loads(values[2])
+            reference["canonical_objects"] = [
+                {
+                    "id": "fireplace",
+                    "identity": "fireplace",
+                    "target_prompt": "stone fireplace",
+                    "spatial_overlap": 0.4,
+                }
+            ]
+            values[2] = json.dumps(reference)
+            return values
+
+        original = _picture(7)
+        finished = torch.nn.functional.interpolate(
+            original.movedim(-1, 1), scale_factor=4, mode="bilinear"
+        ).movedim(1, -1)
+        with tempfile.TemporaryDirectory() as cache_directory:
+            with patch("nodes.cache._cache_root", return_value=Path(cache_directory)):
+                first = node.generate(model, *arguments(original))
+                self.assertIn("RETRY WRITE", first[4])
+                self.assertEqual(node.check_lazy_status(None, *arguments(original)), [])
+                self.assertIn("HIT", node.generate(None, *arguments(original))[4])
+                self.assertEqual(node.check_lazy_status(None, *arguments(finished)), [])
+                self.assertIn("REUSED", node.generate(None, *arguments(finished))[4])
+        self.assertEqual(model.calls, 2)
 
 
 

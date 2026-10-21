@@ -345,8 +345,10 @@ class PromptRecoveryTests(unittest.TestCase):
             }
         )
         self.assertIn("omitted", _expected_object_problem(water_only, reference))
-        self.assertIn(
-            "omitted",
+        # Only a fresh caption is retried for it; a saved or reused caption
+        # that omits the object is still a valid caption.
+        self.assertEqual(
+            "",
             SmartCachedTilePromptGenerator()._caption_problem(
                 water_only,
                 reference,

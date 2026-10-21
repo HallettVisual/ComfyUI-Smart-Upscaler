@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.3.3 — 2026-10-21
+
+**Prompt reuse works on a second pass**
+
+- Loading an upscaled result back in and running it again at 1x with Prompt
+  Reuse on now reuses the scene summary as well as the tile prompts. The summary
+  was only matched at the original picture's exact size, so it was read fresh
+  every time.
+- A tile that correctly left out an object the whole-image read expected there
+  is now served from the cache and reused. Before, it failed that check again
+  on every run and was captioned again each time.
+
 ## 1.3.2 — 2026-10-21
 
 **Tile prompts no longer swap a correct reading for a wrong guess**
